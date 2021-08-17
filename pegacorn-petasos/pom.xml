@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    
+    <parent>
+        <groupId>net.fhirfactory.pegacorn</groupId>
+        <artifactId>pegacorn</artifactId>
+        <version>1.0.0-SNAPSHOT</version>
+        <relativePath>../../pegacorn</relativePath>
+    </parent>
+        
+    <artifactId>pegacorn-petasos</artifactId>
+    <packaging>pom</packaging>
+    
+    <name>Pegacorn :: Petasos </name>
+    <description>The core (common) platform services on which Pegacorn is built</description>
+
+    <properties>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    </properties>
+    
+    <modules>
+        <module>../pegacorn-petasos-model</module>
+        <module>../pegacorn-petasos-datasets</module>
+        <module>../pegacorn-petasos-core</module>
+        <module>../pegacorn-petasos-audit</module>
+        <module>../pegacorn-petasos-caches</module>
+        <module>../pegacorn-petasos-edge</module>
+        <module>../pegacorn-petasos-processingplant</module>
+        <module>../pegacorn-petasos-workshop</module>
+        <module>../pegacorn-petasos-wup</module>
+    </modules>
+</project>
