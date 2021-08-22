@@ -25,7 +25,7 @@ package net.fhirfactory.pegacorn.petasos.core.moa.pathway.wupcontainer.worker.bu
 import net.fhirfactory.pegacorn.petasos.core.moa.pathway.naming.PetasosPathwayExchangePropertyNames;
 import net.fhirfactory.pegacorn.petasos.model.configuration.PetasosPropertyConstants;
 import net.fhirfactory.pegacorn.petasos.model.pathway.WorkUnitTransportPacket;
-import net.fhirfactory.pegacorn.petasos.model.uow.UoW;
+import net.fhirfactory.pegacorn.petasos.core.payloads.uow.UoW;
 import org.apache.camel.Exchange;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -56,7 +56,7 @@ public class WUPIngresConduit {
      */
     public UoW forwardIntoWUP(WorkUnitTransportPacket ingresPacket, Exchange camelExchange){
         LOG.debug(".forwardIntoWUP(): Entry, ingresParcel->{}", ingresPacket);
-        UoW theUoW = ingresPacket.getPayload();
+        UoW theUoW = ingresPacket.getTask();
         camelExchange.setProperty(PetasosPropertyConstants.WUP_JOB_CARD_EXCHANGE_PROPERTY_NAME, ingresPacket.getCurrentJobCard());
         camelExchange.setProperty(PetasosPropertyConstants.WUP_PETASOS_PARCEL_STATUS_EXCHANGE_PROPERTY_NAME, ingresPacket.getCurrentParcelStatus());
         camelExchange.setProperty(PetasosPropertyConstants.WUP_CURRENT_UOW_EXCHANGE_PROPERTY_NAME, theUoW);

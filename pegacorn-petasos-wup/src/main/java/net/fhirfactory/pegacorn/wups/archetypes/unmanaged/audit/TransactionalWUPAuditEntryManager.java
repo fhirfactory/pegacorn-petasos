@@ -31,9 +31,9 @@ import net.fhirfactory.pegacorn.deployment.properties.codebased.DeploymentSystem
 import net.fhirfactory.pegacorn.internals.fhir.r4.internal.topics.FHIRElementTopicFactory;
 import net.fhirfactory.pegacorn.petasos.audit.brokers.STAServicesAuditBroker;
 import net.fhirfactory.pegacorn.petasos.model.resilience.activitymatrix.sta.TransactionStatusElement;
-import net.fhirfactory.pegacorn.petasos.model.uow.UoW;
-import net.fhirfactory.pegacorn.petasos.model.uow.UoWPayload;
-import net.fhirfactory.pegacorn.petasos.model.uow.UoWProcessingOutcomeEnum;
+import net.fhirfactory.pegacorn.petasos.core.payloads.uow.UoW;
+import net.fhirfactory.pegacorn.petasos.core.payloads.uow.UoWPayload;
+import net.fhirfactory.pegacorn.petasos.core.payloads.uow.UoWProcessingOutcomeEnum;
 import net.fhirfactory.pegacorn.petasos.model.wup.WUPJobCard;
 import net.fhirfactory.pegacorn.util.FHIRContextUtility;
 import org.hl7.fhir.r4.model.Resource;

@@ -22,9 +22,9 @@
 
 package net.fhirfactory.pegacorn.petasos.model.wup;
 
-import net.fhirfactory.pegacorn.common.model.componentid.TopologyNodeFDN;
-import net.fhirfactory.pegacorn.common.model.componentid.TopologyNodeFDNToken;
-import net.fhirfactory.pegacorn.common.model.componentid.TopologyNodeRDN;
+import net.fhirfactory.pegacorn.petasos.core.resources.node.datatypes.PetasosNodeFDN;
+import net.fhirfactory.pegacorn.petasos.core.resources.node.datatypes.PetasosNodeToken;
+import net.fhirfactory.pegacorn.petasos.core.resources.node.datatypes.PetasosNodeRDN;
 import org.apache.commons.lang3.SerializationUtils;
 
 import java.io.Serializable;
@@ -34,9 +34,9 @@ import java.util.ArrayList;
  * @author Mark A. Hunter
  * @since 2020-08-07
  */
-public class WUPIdentifier extends TopologyNodeFDNToken implements Serializable {
+public class WUPIdentifier extends PetasosNodeToken implements Serializable {
 	
-    public WUPIdentifier(TopologyNodeFDNToken originalToken) {
+    public WUPIdentifier(PetasosNodeToken originalToken) {
         this.setTokenValue(SerializationUtils.clone(originalToken.getTokenValue()));
     }
     public WUPIdentifier(){super();}
@@ -44,12 +44,12 @@ public class WUPIdentifier extends TopologyNodeFDNToken implements Serializable 
 	@Override
 	public String toString() {
 
-		TopologyNodeFDN tempFDN = new TopologyNodeFDN(this.getTokenValue());
+		PetasosNodeFDN tempFDN = new PetasosNodeFDN(this.getTokenValue());
 		String simpleString = "WUPIdentifier{";
-		ArrayList<TopologyNodeRDN> rdnSet = tempFDN.getHierarchicalNameSet();
+		ArrayList<PetasosNodeRDN> rdnSet = tempFDN.getHierarchicalNameSet();
 		int setSize = rdnSet.size();
 		for (int counter = 0; counter < setSize; counter++) {
-			TopologyNodeRDN currentRDN = rdnSet.get(counter);
+			PetasosNodeRDN currentRDN = rdnSet.get(counter);
 			String currentNameValue = currentRDN.getNodeName();
 			if(currentNameValue.contains(".")){
 				String outputString = currentNameValue.replace(".", "_");

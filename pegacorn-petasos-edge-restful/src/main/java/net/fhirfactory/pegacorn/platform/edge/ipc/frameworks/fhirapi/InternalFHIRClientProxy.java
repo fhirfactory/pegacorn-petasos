@@ -21,7 +21,7 @@
  */
 package net.fhirfactory.pegacorn.platform.edge.ipc.frameworks.fhirapi;
 
-import net.fhirfactory.pegacorn.common.model.componentid.TopologyNodeTypeEnum;
+import net.fhirfactory.pegacorn.petasos.core.resources.node.valuesets.PetasosNodeTypeEnum;
 
 import net.fhirfactory.pegacorn.deployment.names.sites.SiteKeyNames;
 import net.fhirfactory.pegacorn.deployment.topology.manager.TopologyIM;
@@ -31,7 +31,7 @@ import net.fhirfactory.pegacorn.deployment.topology.model.common.IPCInterfaceDef
 import net.fhirfactory.pegacorn.deployment.topology.model.common.TopologyNode;
 
 import net.fhirfactory.pegacorn.deployment.topology.model.nodes.*;
-import net.fhirfactory.pegacorn.internals.PegacornReferenceProperties;
+import net.fhirfactory.pegacorn.internals.fhir.r4.codesystems.PegacornReferenceProperties;
 import org.slf4j.Logger;
 
 import javax.annotation.PostConstruct;
@@ -87,7 +87,7 @@ public abstract class InternalFHIRClientProxy extends HAPIServerSecureProxy {
     protected String deriveTargetEndpointDetails(){
         getLogger().debug(".deriveTargetEndpointDetails(): Entry");
         getLogger().trace(".deriveTargetEndpointDetails(): Target Subsystem Name --> {}, Target Subsystem Version --> {}", specifyFHIRServerSubsystemName(), specifyFHIRServerSubsystemVersion());
-        List<TopologyNode> matchingNodes = topologyIM.nodeSearch(TopologyNodeTypeEnum.SUBSYSTEM, specifyFHIRServerSubsystemName(),  specifyFHIRServerSubsystemVersion());
+        List<TopologyNode> matchingNodes = topologyIM.nodeSearch(PetasosNodeTypeEnum.SUBSYSTEM, specifyFHIRServerSubsystemName(),  specifyFHIRServerSubsystemVersion());
         SubsystemTopologyNode targetSubsystem = (SubsystemTopologyNode)matchingNodes.get(0); // TODO this is brave and a bit stupid, so fix
         getLogger().trace(".deriveTargetEndpointDetails(): Target Subsystem (NodeElement) --> {}", targetSubsystem);
 

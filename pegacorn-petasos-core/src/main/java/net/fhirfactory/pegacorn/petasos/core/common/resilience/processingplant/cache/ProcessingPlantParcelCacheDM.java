@@ -21,19 +21,16 @@
  */
 package net.fhirfactory.pegacorn.petasos.core.common.resilience.processingplant.cache;
 
-import net.fhirfactory.pegacorn.common.model.generalid.FDNToken;
-import net.fhirfactory.pegacorn.petasos.model.resilience.parcel.ResilienceParcel;
-import net.fhirfactory.pegacorn.petasos.model.resilience.parcel.ResilienceParcelIdentifier;
-import net.fhirfactory.pegacorn.petasos.model.resilience.parcel.ResilienceParcelProcessingStatusEnum;
+import net.fhirfactory.pegacorn.petasos.core.resources.task.datatypes.PetasosTaskToken;
 import net.fhirfactory.pegacorn.petasos.model.wup.WUPIdentifier;
+import net.fhirfactory.pegacorn.petasos.core.resources.task.PetasosTask;
+import net.fhirfactory.pegacorn.petasos.core.resources.task.valuesets.PetasosTaskFinalisationStatusEnum;
+import org.hl7.fhir.r4.model.Task;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.enterprise.context.ApplicationScoped;
-import javax.transaction.Transactional;
-import java.util.Iterator;
-import java.util.LinkedList;
-import java.util.List;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
@@ -51,180 +48,137 @@ import java.util.concurrent.ConcurrentHashMap;
 public class ProcessingPlantParcelCacheDM {
     private static final Logger LOG = LoggerFactory.getLogger(ProcessingPlantParcelCacheDM.class);
 
-    private ConcurrentHashMap<ResilienceParcelIdentifier, ResilienceParcel> petasosParcelCache;
+    private ConcurrentHashMap<PetasosTaskToken, PetasosTask> petasosTaskCache;
 
     public ProcessingPlantParcelCacheDM() {
-        petasosParcelCache = new ConcurrentHashMap<ResilienceParcelIdentifier, ResilienceParcel>();
+        petasosTaskCache = new ConcurrentHashMap<PetasosTaskToken, PetasosTask>();
     }
 
-    /**
-     * This function adds a ResilienceParcel to the Parcel Cache. If a Parcel was already associated
-     * to the particular ParcelID, it replaces it.
-     * @param parcel The ResilienceParcel to be added to the (ConcurrentHashMap) Cache
-     */
-    @Transactional
-    public void addParcel(ResilienceParcel parcel) {
+    public void addTask(PetasosTask parcel) {
         LOG.debug(".addParcel(): Entry, parcel --> {}", parcel);
         if (parcel == null) {
             return;
         }
-        if (!parcel.hasInstanceIdentifier()) {
+        if (!parcel.hasPetasosTaskToken()) {
             return;
         }
-        ResilienceParcelIdentifier parcelInstanceID = parcel.getIdentifier();
-        if(petasosParcelCache.containsKey(parcelInstanceID)){
-            petasosParcelCache.remove(parcelInstanceID);
+        PetasosTaskToken parcelInstanceID = parcel.getPetasosTaskToken();
+        if(petasosTaskCache.containsKey(parcelInstanceID)){
+            petasosTaskCache.remove(parcelInstanceID);
         }
-        petasosParcelCache.put(parcelInstanceID, parcel);
+        petasosTaskCache.put(parcelInstanceID, parcel);
     }
 
-    /**
-     * This function returns the ResilienceParcel for the given Resilience Parcel ID.
-     * @param parcelInstanceID The FDNToken of the ResilienceParcel requested
-     * @return The ResilienceParcel instance associated with the provided ParcelInstanceID (FDNToken)
-     */
-    public ResilienceParcel getParcelInstance(FDNToken parcelInstanceID) {
-        LOG.debug(".getParcelInstance(): Entry, parcelInstanceID --> {}", parcelInstanceID);
-        if (petasosParcelCache.containsKey(parcelInstanceID)) {
-            return (petasosParcelCache.get(parcelInstanceID));
+    public PetasosTask getTask(PetasosTaskToken taskToken) {
+        LOG.debug(".getTask(): Entry, taskToken --> {}", taskToken);
+        if (petasosTaskCache.containsKey(taskToken)) {
+            return (petasosTaskCache.get(taskToken));
         }
         return (null);
     }
 
-    /**
-     * This function removes the ResilienceParcel from the Cache.
-     * @param parcel The ResilienceParcel to be removed from the Cache
-     */
-    @Transactional
-    public void removeParcel(ResilienceParcel parcel) {
-        LOG.debug(".removeParcel(): Entry, parcel --> {}", parcel);
-        if (parcel == null) {
+    public void removeTask(PetasosTask petasosTask) {
+        LOG.debug(".removeTask(): Entry, petasosTask --> {}", petasosTask);
+        if (petasosTask == null) {
             return;
         }
-        if (!parcel.hasInstanceIdentifier()) {
+        if (!petasosTask.hasPetasosTaskToken()) {
             return;
         }
-        if(petasosParcelCache.containsKey(parcel.getIdentifier())) {
-            petasosParcelCache.remove(parcel.getIdentifier());
+        if(petasosTaskCache.containsKey(petasosTask.getPetasosTaskToken())) {
+            petasosTaskCache.remove(petasosTask.getPetasosTaskToken());
         }
     }
 
-    /**
-     * This function removes the ResilienceParcel from the Cache.
-     * @param parcelInstanceID The Identifier (FDNToken) of the ResilienceParcel to be removed
-     */
-    @Transactional
-    public void removeParcel(ResilienceParcelIdentifier parcelInstanceID) {
-        LOG.debug(".removeParcel(): Entry, parcelInstanceID --> {}", parcelInstanceID);
-        if (parcelInstanceID == null) {
+    public void removeTask(PetasosTaskToken taskToken) {
+        LOG.debug(".removeTask(): Entry, taskToken --> {}", taskToken);
+        if (taskToken == null) {
             return;
         }
-        if(petasosParcelCache.containsKey(parcelInstanceID)) {
-            petasosParcelCache.remove(parcelInstanceID);
+        if(petasosTaskCache.containsKey(taskToken)) {
+            petasosTaskCache.remove(taskToken);
         }
     }
 
-    /**
-     * This function replaces the ResilienceParcel within the Cache with a new
-     * instance.
-     * @param newParcel The new ResilienceParcel instance
-     */
-    @Transactional
-    public void updateParcel(ResilienceParcel newParcel) {
-        LOG.debug(".updateParcel() Entry, parcel --> {}", newParcel);
-        if (newParcel == null) {
-            throw (new IllegalArgumentException("newParcel is null"));
-        }
-        if (petasosParcelCache.containsKey(newParcel.getIdentifier())) {
-            petasosParcelCache.remove(newParcel.getIdentifier());
-        }
-        petasosParcelCache.put(newParcel.getIdentifier(), newParcel);
-    }
-
-    /**
-     * This function returns a List of all the ResilienceParcel instances within the cache
-     * @return A List of all the ResilienceParcel instances contained within the Cache
-     */
-    public List<ResilienceParcel> getParcelSet() {
-        LOG.debug(".getParcelSet(): Entry");
-        List<ResilienceParcel> parcelList = new LinkedList<ResilienceParcel>();
-        petasosParcelCache.entrySet().forEach(entry -> parcelList.add(entry.getValue()));
+    public List<PetasosTask> getPetasosTaskList() {
+        LOG.debug(".getPetasosTaskList(): Entry");
+        List<PetasosTask> parcelList = new ArrayList<>();
+        Collection<PetasosTask> taskCollection = petasosTaskCache.values();
+        parcelList.addAll(taskCollection);
         return (parcelList);
     }
 
-    public List<ResilienceParcel> getParcelSetByState(ResilienceParcelProcessingStatusEnum status) {
+    public List<PetasosTask> getPetasosTaskByState(Task.TaskStatus status) {
         LOG.debug(".getParcelSet(): Entry, status --> {}", status);
-        List<ResilienceParcel> parcelList = new LinkedList<ResilienceParcel>();
-        Iterator<ResilienceParcel> parcelListIterator = getParcelSet().iterator();
-        while (parcelListIterator.hasNext()) {
-            ResilienceParcel currentParcel = parcelListIterator.next();
-            if (currentParcel.hasProcessingStatus()) {
-                if (currentParcel.getProcessingStatus() == status) {
-                    parcelList.add(currentParcel);
+        List<PetasosTask> parcelList = new ArrayList<>();
+        Collection<PetasosTask> taskCollection = petasosTaskCache.values();
+        for(PetasosTask currentTask: taskCollection){
+            if (currentTask.hasStatus()) {
+                if (currentTask.getStatus().equals(status)) {
+                    parcelList.add(currentTask);
                 }
             }
         }
         return (parcelList);
     }
 
-    public List<ResilienceParcel> getActiveParcelSet() {
-        List<ResilienceParcel> parcelList = getParcelSetByState(ResilienceParcelProcessingStatusEnum.PARCEL_STATUS_ACTIVE);
+    public List<PetasosTask> getActiveTaskList() {
+        List<PetasosTask> parcelList = getPetasosTaskByState(Task.TaskStatus.INPROGRESS);
         return (parcelList);
     }
 
-    public List<ResilienceParcel> getFinishedParcelSet() {
-        List<ResilienceParcel> parcelList = getParcelSetByState(ResilienceParcelProcessingStatusEnum.PARCEL_STATUS_FINISHED);
+    public List<PetasosTask> getFinishedTaskList() {
+        List<PetasosTask> parcelList = getPetasosTaskByState(Task.TaskStatus.COMPLETED);
         return (parcelList);
     }
 
-    public List<ResilienceParcel> getFinalisedParcelSet() {
-        List<ResilienceParcel> parcelList = getParcelSetByState(ResilienceParcelProcessingStatusEnum.PARCEL_STATUS_FINALISED);
+    public List<PetasosTask> getFinalisedTaskList() {
+        List<PetasosTask> parcelList = new ArrayList<>();
+        Collection<PetasosTask> taskCollection = petasosTaskCache.values();
+        for(PetasosTask currentTask: taskCollection){
+            if (currentTask.hasFinalisationStatus()) {
+                if (currentTask.getFinalisationStatus().equals(PetasosTaskFinalisationStatusEnum.PARCEL_FINALISATION_STATUS_FINALISED)) {
+                    parcelList.add(currentTask);
+                }
+            }
+        }
         return (parcelList);
     }
 
-    public List<ResilienceParcel> getInProgressParcelSet() {
+    public List<PetasosTask> getReadyTaskList() {
         LOG.debug(".getInProgressParcelSet(): Entry");
-        List<ResilienceParcel> parcelList = new LinkedList<ResilienceParcel>();
-        parcelList.addAll(getParcelSetByState(ResilienceParcelProcessingStatusEnum.PARCEL_STATUS_ACTIVE));
-        parcelList.addAll(getParcelSetByState(ResilienceParcelProcessingStatusEnum.PARCEL_STATUS_INITIATED));
-        parcelList.addAll(getParcelSetByState(ResilienceParcelProcessingStatusEnum.PARCEL_STATUS_REGISTERED));
+        List<PetasosTask> parcelList = getPetasosTaskByState(Task.TaskStatus.READY);
         return (parcelList);
     }
 
-    public List<ResilienceParcel> getParcelByEpisodeID(FDNToken parcelTypeID) {
-        LOG.debug(".getInProgressParcelSet(): Entry, parcelTypeID --> {}" + parcelTypeID);
-        List<ResilienceParcel> parcelList = new LinkedList<ResilienceParcel>();
-        Iterator<ResilienceParcel> parcelListIterator = getParcelSet().iterator();
-        while (parcelListIterator.hasNext()) {
-            ResilienceParcel currentParcel = parcelListIterator.next();
-            if (currentParcel.hasEpisodeIdentifier()) {
-                if (currentParcel.getEpisodeIdentifier().equals(parcelTypeID)) {
-                    parcelList.add(currentParcel);
+    public List<PetasosTask> getTaskListForEpisode(PetasosTaskToken episodeID) {
+        LOG.debug(".getTaskListForEpisode(): Entry, episodeID --> {}" + episodeID);
+        List<PetasosTask> taskList = new LinkedList<>();
+        Collection<PetasosTask> allTasksList = this.petasosTaskCache.values();
+        for(PetasosTask currentTask: allTasksList){
+            if(currentTask.hasGroupIdentifier()){
+                if(currentTask.getGroupIdentifier().getValue().contentEquals(episodeID.getContent())){
+                    taskList.add(currentTask);
                 }
             }
         }
-        return (parcelList);
+        return (taskList);
     }
 
 
 
-    public ResilienceParcel getCurrentParcelForWUP(WUPIdentifier wupInstanceID, FDNToken uowInstanceID) {
+    public List<PetasosTask> getCurrentTasksForWUP(WUPIdentifier wupInstanceID) {
         LOG.debug(".getCurrentParcel(): Entry, wupInstanceID --> {}" + wupInstanceID);
-        List<ResilienceParcel> parcelList = new LinkedList<ResilienceParcel>();
-        Iterator<ResilienceParcel> parcelListIterator = getParcelSet().iterator();
-        while (parcelListIterator.hasNext()) {
-            ResilienceParcel currentParcel = parcelListIterator.next();
-            if (currentParcel.hasAssociatedWUPIdentifier()) {
-                if (currentParcel.getAssociatedWUPIdentifier().equals(wupInstanceID)) {
-                    if (currentParcel.hasActualUoW()) {
-                        if (currentParcel.getActualUoW().getInstanceID().equals(uowInstanceID)) {
-                            return (currentParcel);
-                        }
-                    }
+        List<PetasosTask> taskList = new ArrayList<>();
+        Collection<PetasosTask> fullTaskList = this.petasosTaskCache.values();
+        for(PetasosTask currentTask: fullTaskList) {
+            if (currentTask.hasOwner()) {
+                if (currentTask.getOwner().getIdentifier().getValue().contentEquals(wupInstanceID.getTokenValue())) {
+                    taskList.add(currentTask);
                 }
             }
         }
-        return (null);
+        return (taskList);
     }
 
 }

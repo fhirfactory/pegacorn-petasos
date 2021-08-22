@@ -22,12 +22,12 @@
 
 package net.fhirfactory.pegacorn.petasos.core.moa.resilience.processingplant.manager.tasks;
 
-import net.fhirfactory.pegacorn.common.model.componentid.TopologyNodeFDN;
+import net.fhirfactory.pegacorn.petasos.core.resources.node.datatypes.PetasosNodeFDN;
 import net.fhirfactory.pegacorn.deployment.topology.manager.TopologyIM;
 import net.fhirfactory.pegacorn.deployment.topology.model.nodes.WorkUnitProcessorTopologyNode;
 import net.fhirfactory.pegacorn.petasos.core.moa.resilience.processingplant.cache.ProcessingPlantWUAEpisodeActivityMatrixDM;
 import net.fhirfactory.pegacorn.petasos.model.pathway.ActivityID;
-import net.fhirfactory.pegacorn.petasos.model.resilience.activitymatrix.moa.ParcelStatusElement;
+import net.fhirfactory.pegacorn.petasos.model.resilience.activitymatrix.moa.PetasosTaskStatusElement;
 import net.fhirfactory.pegacorn.petasos.model.resilience.parcel.ResilienceParcelProcessingStatusEnum;
 import net.fhirfactory.pegacorn.petasos.model.wup.WUPJobCard;
 import org.slf4j.Logger;
@@ -46,18 +46,18 @@ public class RegisterNewMOAWorkUnitActivityTask {
 	@Inject
 	TopologyIM topologyIM;
 
-	public ParcelStatusElement registerNewWUA(WUPJobCard submittedJobCard) {
+	public PetasosTaskStatusElement registerNewWUA(WUPJobCard submittedJobCard) {
 		LOG.debug(".registerNewWUA(): Now register the parcel with the ActivityMatrix, submittedJobCard -- {}",
 				submittedJobCard);
 		if (submittedJobCard == null) {
 			throw (new IllegalArgumentException(".doTask(): submittedJobCard is null"));
 		}
 		ActivityID activityID = submittedJobCard.getActivityID();
-		ParcelStatusElement newStatusElement;
+		PetasosTaskStatusElement newStatusElement;
 		LOG.trace(".registerNewWUA(): Getting the topologyNode( WorkUnitProcessorTopologyNode) from the TopologyCache");
-		TopologyNodeFDN topologyNodeFDN = new TopologyNodeFDN(activityID.getPresentWUPIdentifier());
-		LOG.trace(".registerNewWUA(): First, extracted the topologyNodeFDN (TopologyNodeFDN) from the activityID's presentWUPIdentifier field, value->{}", topologyNodeFDN);
-		WorkUnitProcessorTopologyNode topologyNode = (WorkUnitProcessorTopologyNode) topologyIM.getNode(topologyNodeFDN);
+		PetasosNodeFDN petasosNodeFDN = new PetasosNodeFDN(activityID.getPresentWUPIdentifier());
+		LOG.trace(".registerNewWUA(): First, extracted the topologyNodeFDN (TopologyNodeFDN) from the activityID's presentWUPIdentifier field, value->{}", petasosNodeFDN);
+		WorkUnitProcessorTopologyNode topologyNode = (WorkUnitProcessorTopologyNode) topologyIM.getNode(petasosNodeFDN);
 		LOG.trace(".registerNewWUA(): Extracted the topologyNode, value -->{}", topologyNode);
 		switch (topologyNode.getResilienceMode()) {
 			case RESILIENCE_MODE_MULTISITE: {
@@ -120,8 +120,8 @@ public class RegisterNewMOAWorkUnitActivityTask {
 					default:
 						LOG.trace(".registerNewWUA(): Defaulting to -Standalone-/-Standalone- Reliability/Concurrency Mode");
 						newStatusElement = activityMatrixDM.addWUA(activityID, ResilienceParcelProcessingStatusEnum.PARCEL_STATUS_REGISTERED);
-						activityMatrixDM.setClusterWideFocusElement(activityID.getPresentEpisodeIdentifier(), activityID.getPresentParcelIdentifier());
-						activityMatrixDM.setSystemWideFocusElement(activityID.getPresentEpisodeIdentifier(), activityID.getPresentParcelIdentifier());
+						activityMatrixDM.setClusterWideFocusElement(activityID.getCurrentEpisodeID(), activityID.getCurrentTaskID());
+						activityMatrixDM.setSystemWideFocusElement(activityID.getCurrentEpisodeID(), activityID.getCurrentTaskID());
 						LOG.debug(".registerNewWUA(): Exit, newStatusElement --> {}", newStatusElement);
 						return (newStatusElement);
 				}

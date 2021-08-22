@@ -25,7 +25,7 @@ package net.fhirfactory.pegacorn.petasos.model.resilience.episode;
 import java.io.Serializable;
 import java.util.ArrayList;
 
-import net.fhirfactory.pegacorn.common.model.componentid.TopologyNodeFunctionFDN;
+import net.fhirfactory.pegacorn.petasos.core.resources.node.datatypes.PetasosNodeFunctionFDN;
 import net.fhirfactory.pegacorn.common.model.generalid.FDN;
 import net.fhirfactory.pegacorn.common.model.generalid.FDNToken;
 import net.fhirfactory.pegacorn.common.model.generalid.RDN;
@@ -67,7 +67,7 @@ public class PetasosEpisodeIdentifier extends FDNToken implements Serializable {
 	        return(simpleString);
 	}
 
-	public PetasosEpisodeIdentifier(TopologyNodeFunctionFDN functionFDN){
+	public PetasosEpisodeIdentifier(PetasosNodeFunctionFDN functionFDN){
     	super();
     	this.setContent(functionFDN.toTypeBasedFDNWithVersion().getToken().getContent());
 	}

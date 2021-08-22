@@ -24,7 +24,7 @@ package net.fhirfactory.pegacorn.wups.archetypes.petasosenabled.apiactivitybased
 
 import net.fhirfactory.pegacorn.petasos.core.sta.wup.GenericSTAServerWUPTemplate;
 import net.fhirfactory.pegacorn.petasos.model.pathway.ActivityID;
-import net.fhirfactory.pegacorn.petasos.model.uow.UoW;
+import net.fhirfactory.pegacorn.petasos.core.payloads.uow.UoW;
 import net.fhirfactory.pegacorn.petasos.model.wup.WUPClusterModeEnum;
 import net.fhirfactory.pegacorn.petasos.model.wup.WUPSystemModeEnum;
 import org.slf4j.Logger;
@@ -43,7 +43,7 @@ public abstract class InteractAPIServletRESTfulGETGatewayWUP extends GenericSTAS
      public void registerActivityStart(UoW unitOfWork, WUPClusterModeEnum clusterMode, WUPSystemModeEnum systemMode){
         LOG.debug(".registerActivityStart(): Entry, unitOfWork --> {}", unitOfWork);
         ActivityID newActivityID = new ActivityID();
-        newActivityID.setPresentWUPFunctionToken(this.getWUP().getNodeFunctionFDN().getFunctionToken());
+        newActivityID.setCurrentDeliveredCapability(this.getWUP().getNodeFunctionFDN().getFunctionToken());
         newActivityID.setPresentWUPIdentifier(this.getWUPIdentifier());
      }
 

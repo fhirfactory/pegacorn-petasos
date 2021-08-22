@@ -22,8 +22,8 @@
 package net.fhirfactory.pegacorn.petasos.core.moa.wup;
 
 import net.fhirfactory.pegacorn.camel.BaseRouteBuilder;
-import net.fhirfactory.pegacorn.common.model.componentid.TopologyNodeFDN;
-import net.fhirfactory.pegacorn.common.model.componentid.TopologyNodeTypeEnum;
+import net.fhirfactory.pegacorn.petasos.core.resources.node.datatypes.PetasosNodeFDN;
+import net.fhirfactory.pegacorn.petasos.core.resources.node.valuesets.PetasosNodeTypeEnum;
 import net.fhirfactory.pegacorn.components.dataparcel.DataParcelManifest;
 import net.fhirfactory.pegacorn.components.interfaces.topology.PegacornTopologyFactoryInterface;
 import net.fhirfactory.pegacorn.components.interfaces.topology.ProcessingPlantInterface;
@@ -31,7 +31,6 @@ import net.fhirfactory.pegacorn.components.interfaces.topology.WorkshopInterface
 import net.fhirfactory.pegacorn.deployment.topology.manager.TopologyIM;
 import net.fhirfactory.pegacorn.deployment.topology.model.common.IPCInterface;
 import net.fhirfactory.pegacorn.deployment.topology.model.common.IPCInterfaceDefinition;
-import net.fhirfactory.pegacorn.deployment.topology.model.endpoints.base.IPCClusteredServerTopologyEndpoint;
 import net.fhirfactory.pegacorn.deployment.topology.model.endpoints.base.IPCServerTopologyEndpoint;
 import net.fhirfactory.pegacorn.deployment.topology.model.endpoints.base.IPCTopologyEndpoint;
 import net.fhirfactory.pegacorn.deployment.topology.model.nodes.ProcessingPlantTopologyNode;
@@ -291,7 +290,7 @@ public abstract class  GenericMessageBasedWUPTemplate extends BaseRouteBuilder {
                 specifyWUPInstanceName(),
                 specifyWUPInstanceVersion(),
                 getWorkshop().getWorkshopNode(),
-                TopologyNodeTypeEnum.WUP);
+                PetasosNodeTypeEnum.WUP);
         getTopologyIM().addTopologyNode(getWorkshop().getWorkshopNode().getNodeFDN(), wupNode);
         wupNode.setResilienceMode(getWorkshop().getWorkshopNode().getResilienceMode());
         wupNode.setConcurrencyMode(getWorkshop().getWorkshopNode().getConcurrencyMode());
@@ -307,7 +306,7 @@ public abstract class  GenericMessageBasedWUPTemplate extends BaseRouteBuilder {
         getLogger().debug(".deriveServerTopologyEndpoint(): Entry, interfaceName->{}, interfaceDefinition->{}", interfaceName, interfaceDefinition);
         ProcessingPlantTopologyNode processingPlantTopologyNode = processingPlantServices.getProcessingPlantNode();
         getLogger().trace(".deriveServerTopologyEndpoint(): Parse through all endpoints and their IPC Definitions");
-        for(TopologyNodeFDN endpointFDN: processingPlantTopologyNode.getEndpoints()){
+        for(PetasosNodeFDN endpointFDN: processingPlantTopologyNode.getEndpoints()){
             IPCServerTopologyEndpoint endpoint = (IPCServerTopologyEndpoint)topologyIM.getNode(endpointFDN);
             getLogger().trace(".deriveServerTopologyEndpoint(): endpoint->{}", endpoint);
             if(endpoint.getName().equalsIgnoreCase(interfaceName)) {
@@ -330,8 +329,8 @@ public abstract class  GenericMessageBasedWUPTemplate extends BaseRouteBuilder {
 
     protected IPCTopologyEndpoint getTopologyEndpoint(String topologyEndpointName){
         getLogger().debug(".getTopologyEndpoint(): Entry, topologyEndpointName->{}", topologyEndpointName);
-        ArrayList<TopologyNodeFDN> endpointFDNs = getProcessingPlant().getProcessingPlantNode().getEndpoints();
-        for(TopologyNodeFDN currentEndpointFDN: endpointFDNs){
+        ArrayList<PetasosNodeFDN> endpointFDNs = getProcessingPlant().getProcessingPlantNode().getEndpoints();
+        for(PetasosNodeFDN currentEndpointFDN: endpointFDNs){
             IPCTopologyEndpoint endpointTopologyNode = (IPCTopologyEndpoint)getTopologyIM().getNode(currentEndpointFDN);
             if(endpointTopologyNode.getName().contentEquals(topologyEndpointName)){
                 getLogger().debug(".getTopologyEndpoint(): Exit, node found -->{}", endpointTopologyNode);

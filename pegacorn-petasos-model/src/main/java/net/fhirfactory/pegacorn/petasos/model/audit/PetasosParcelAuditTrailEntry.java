@@ -26,8 +26,8 @@ import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import net.fhirfactory.pegacorn.common.model.generalid.FDNToken;
 import net.fhirfactory.pegacorn.petasos.model.resilience.episode.PetasosEpisodeIdentifier;
 import net.fhirfactory.pegacorn.petasos.model.resilience.parcel.ResilienceParcel;
-import net.fhirfactory.pegacorn.petasos.model.resilience.parcel.ResilienceParcelIdentifier;
-import net.fhirfactory.pegacorn.petasos.model.uow.UoW;
+import net.fhirfactory.pegacorn.petasos.core.resources.task.datatypes.PetasosTaskToken;
+import net.fhirfactory.pegacorn.petasos.core.payloads.uow.UoW;
 
 import java.time.Instant;
 import java.util.Date;
@@ -41,11 +41,11 @@ import net.fhirfactory.pegacorn.petasos.model.wup.WUPIdentifier;
 public class PetasosParcelAuditTrailEntry {
     private Date auditTrailEntryDate;
     private UoW actualUoW;
-    private ResilienceParcelIdentifier identifier;
+    private PetasosTaskToken identifier;
     private ResilienceParcelFinalisationStatusEnum parcelFinalsationStatus;
     private ResilienceParcelProcessingStatusEnum processingStatus;
     private HashSet<WUPIdentifier> alternativeWUPIdentifierSet;
-    private HashSet<ResilienceParcelIdentifier> alternativeParcelIdentifiersSet;
+    private HashSet<PetasosTaskToken> alternativeParcelIdentifiersSet;
     private HashSet<PetasosEpisodeIdentifier> downstreamEpisodeIdentifierSet;
     private PetasosEpisodeIdentifier upstreamEpisodeIdentifier;
     private WUPIdentifier primaryWUPIdentifier;
@@ -358,11 +358,11 @@ public class PetasosParcelAuditTrailEntry {
         this.parcelFinalisedDate = parcelFinalisedDate;
     }
 
-    public ResilienceParcelIdentifier getIdentifier() {
+    public PetasosTaskToken getIdentifier() {
         return identifier;
     }
 
-    public void setIdentifier(ResilienceParcelIdentifier identifier) {
+    public void setIdentifier(PetasosTaskToken identifier) {
         this.identifier = identifier;
     }
 

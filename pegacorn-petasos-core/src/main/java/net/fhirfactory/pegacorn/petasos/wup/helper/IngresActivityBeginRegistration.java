@@ -22,15 +22,15 @@
 
 package net.fhirfactory.pegacorn.petasos.wup.helper;
 
-import net.fhirfactory.pegacorn.common.model.componentid.TopologyNodeFunctionFDNToken;
+import net.fhirfactory.pegacorn.petasos.core.resources.node.datatypes.PetasosNodeFunctionFDNToken;
 import net.fhirfactory.pegacorn.deployment.topology.manager.TopologyIM;
 import net.fhirfactory.pegacorn.deployment.topology.model.nodes.WorkUnitProcessorTopologyNode;
 import net.fhirfactory.pegacorn.petasos.core.moa.brokers.PetasosMOAServicesBroker;
 import net.fhirfactory.pegacorn.petasos.core.moa.pathway.naming.PetasosPathwayExchangePropertyNames;
 import net.fhirfactory.pegacorn.petasos.model.configuration.PetasosPropertyConstants;
 import net.fhirfactory.pegacorn.petasos.model.pathway.ActivityID;
-import net.fhirfactory.pegacorn.petasos.model.resilience.activitymatrix.moa.ParcelStatusElement;
-import net.fhirfactory.pegacorn.petasos.model.uow.UoW;
+import net.fhirfactory.pegacorn.petasos.model.resilience.activitymatrix.moa.PetasosTaskStatusElement;
+import net.fhirfactory.pegacorn.petasos.core.payloads.uow.UoW;
 import net.fhirfactory.pegacorn.petasos.model.wup.WUPActivityStatusEnum;
 import net.fhirfactory.pegacorn.petasos.model.wup.WUPIdentifier;
 import net.fhirfactory.pegacorn.petasos.model.wup.WUPJobCard;
@@ -74,18 +74,18 @@ public class IngresActivityBeginRegistration {
 
 //        TopologyNodeFDNToken nodeFDNToken = new TopologyNodeFDNToken(wupInstanceKey);
         LOG.trace(".registerActivityStart(): Node Element retrieved --> {}", wup);
-        TopologyNodeFunctionFDNToken wupFunctionToken = wup.getNodeFunctionFDN().getFunctionToken();
+        PetasosNodeFunctionFDNToken wupFunctionToken = wup.getNodeFunctionFDN().getFunctionToken();
         LOG.trace(".registerActivityStart(): wupFunctionToken (NodeElementFunctionToken) for this activity --> {}", wupFunctionToken);        
         LOG.trace(".registerActivityStart(): Building the ActivityID for this activity");
         WUPIdentifier wupID = new WUPIdentifier(wup.getNodeFDN().getToken());
         ActivityID newActivityID = new ActivityID();
-        newActivityID.setPresentWUPFunctionToken(wupFunctionToken);
+        newActivityID.setCurrentDeliveredCapability(wupFunctionToken);
         newActivityID.setPresentWUPIdentifier(wupID);
         LOG.trace(".registerActivityStart(): newActivityID (ActivityID) --> {}", newActivityID);
         LOG.trace(".registerActivityStart(): Creating new JobCard");
         WUPJobCard activityJobCard = new WUPJobCard(newActivityID, WUPActivityStatusEnum.WUP_ACTIVITY_STATUS_EXECUTING, WUPActivityStatusEnum.WUP_ACTIVITY_STATUS_EXECUTING, wup.getConcurrencyMode(), wup.getResilienceMode(),  Date.from(Instant.now()));
         LOG.trace(".registerActivityStart(): Registering the Work Unit Activity using the activityJobCard --> {} and UoW --> {}", activityJobCard, theUoW);
-        ParcelStatusElement statusElement = servicesBroker.registerSystemEdgeWorkUnitActivity(activityJobCard, theUoW);
+        PetasosTaskStatusElement statusElement = servicesBroker.registerSystemEdgeWorkUnitActivity(activityJobCard, theUoW);
         LOG.trace(".registerActivityStart(): Registration aftermath: statusElement --> {}", statusElement);
         // Now we have to Inject some details into the Exchange so that the WUPEgressConduit can extract them as per standard practice
         LOG.trace(".registerActivityStart(): Injecting Job Card and Status Element into Exchange for extraction by the WUP Egress Conduit");

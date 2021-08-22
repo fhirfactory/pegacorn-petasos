@@ -21,14 +21,13 @@
  */
 package net.fhirfactory.pegacorn.processingplant;
 
-import net.fhirfactory.pegacorn.common.model.componentid.TopologyNodeFDN;
-import net.fhirfactory.pegacorn.common.model.componentid.TopologyNodeFunctionFDN;
-import net.fhirfactory.pegacorn.common.model.componentid.TopologyNodeRDN;
-import net.fhirfactory.pegacorn.common.model.componentid.TopologyNodeTypeEnum;
-import net.fhirfactory.pegacorn.components.capabilities.CapabilityFulfillmentInterface;
-import net.fhirfactory.pegacorn.components.capabilities.CapabilityFulfillmentManagementInterface;
-import net.fhirfactory.pegacorn.components.capabilities.base.CapabilityUtilisationRequest;
-import net.fhirfactory.pegacorn.components.capabilities.base.CapabilityUtilisationResponse;
+import net.fhirfactory.pegacorn.petasos.core.resources.node.datatypes.PetasosNodeFDN;
+import net.fhirfactory.pegacorn.petasos.core.resources.node.datatypes.PetasosNodeFunctionFDN;
+import net.fhirfactory.pegacorn.petasos.core.resources.node.datatypes.PetasosNodeRDN;
+import net.fhirfactory.pegacorn.petasos.core.resources.node.valuesets.PetasosNodeTypeEnum;
+import net.fhirfactory.pegacorn.petasos.model.capabilities.CapabilityFulfillmentInterface;
+import net.fhirfactory.pegacorn.petasos.model.capabilities.base.CapabilityUtilisationRequest;
+import net.fhirfactory.pegacorn.petasos.model.capabilities.base.CapabilityUtilisationResponse;
 import net.fhirfactory.pegacorn.components.interfaces.topology.PegacornTopologyFactoryInterface;
 import net.fhirfactory.pegacorn.components.interfaces.topology.ProcessingPlantInterface;
 import net.fhirfactory.pegacorn.deployment.properties.configurationfilebased.common.archetypes.ClusterServiceDeliverySubsystemPropertyFile;
@@ -45,7 +44,6 @@ import org.slf4j.Logger;
 import javax.annotation.PostConstruct;
 import javax.inject.Inject;
 import java.time.Instant;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
@@ -113,7 +111,7 @@ public abstract class ProcessingPlant extends RouteBuilder implements Processing
         return (topologyIM);
     }
 
-    public TopologyNodeFunctionFDN getNodeToken() {
+    public PetasosNodeFunctionFDN getNodeToken() {
         return (this.processingPlantNode.getNodeFunctionFDN());
     }
 
@@ -123,7 +121,7 @@ public abstract class ProcessingPlant extends RouteBuilder implements Processing
         String processingPlantVersion = getPropertyFile().getSubsystemInstant().getProcessingPlantVersion();
         getLogger().debug(".resolveProcessingPlant(): Getting ProcessingPlant->{}, version->{}", processingPlantName, processingPlantVersion);
         getLogger().trace(".resolveProcessingPlant(): Resolving list of available ProcessingPlants");
-        List<TopologyNode> topologyNodes = topologyIM.nodeSearch(TopologyNodeTypeEnum.PROCESSING_PLANT, processingPlantName, processingPlantVersion);
+        List<TopologyNode> topologyNodes = topologyIM.nodeSearch(PetasosNodeTypeEnum.PROCESSING_PLANT, processingPlantName, processingPlantVersion);
         if(getLogger().isTraceEnabled()){
             if(topologyNodes == null){
                 getLogger().trace(".resolveProcessingPlant(): nodeSearch return a null list");
@@ -165,7 +163,7 @@ public abstract class ProcessingPlant extends RouteBuilder implements Processing
         return (this.processingPlantNode);
     }
 
-    public TopologyNodeFDN getProcessingPlantNodeFDN() {
+    public PetasosNodeFDN getProcessingPlantNodeFDN() {
         return (this.processingPlantNode.getNodeFDN());
     }
 
@@ -174,9 +172,9 @@ public abstract class ProcessingPlant extends RouteBuilder implements Processing
         getLogger().debug(".getWorkshop(): Entry, workshopName --> {}, version --> {}", workshopName, version);
         boolean found = false;
         WorkshopTopologyNode foundWorkshop = null;
-        for (TopologyNodeFDN containedWorkshopFDN : this.processingPlantNode.getWorkshops()) {
+        for (PetasosNodeFDN containedWorkshopFDN : this.processingPlantNode.getWorkshops()) {
             WorkshopTopologyNode containedWorkshop = (WorkshopTopologyNode)topologyIM.getNode(containedWorkshopFDN);
-            TopologyNodeRDN testRDN = new TopologyNodeRDN(TopologyNodeTypeEnum.WORKSHOP, workshopName, version);
+            PetasosNodeRDN testRDN = new PetasosNodeRDN(PetasosNodeTypeEnum.WORKSHOP, workshopName, version);
             if (testRDN.equals(containedWorkshop.getNodeRDN())) {
                 found = true;
                 foundWorkshop = containedWorkshop;
@@ -201,7 +199,7 @@ public abstract class ProcessingPlant extends RouteBuilder implements Processing
 
     @Override
     public String getSimpleFunctionName() {
-        TopologyNodeRDN functionRDN = getProcessingPlantNode().getNodeFunctionFDN().extractRDNForNodeType(TopologyNodeTypeEnum.PROCESSING_PLANT);
+        PetasosNodeRDN functionRDN = getProcessingPlantNode().getNodeFunctionFDN().extractRDNForNodeType(PetasosNodeTypeEnum.PROCESSING_PLANT);
         String functionName = functionRDN.getNodeName();
         return (functionName);
     }
@@ -225,7 +223,7 @@ public abstract class ProcessingPlant extends RouteBuilder implements Processing
 
     @Override
     public String getDeploymentSite() {
-        TopologyNodeRDN siteRDN = getProcessingPlantNode().getNodeFDN().extractRDNForNodeType(TopologyNodeTypeEnum.SITE);
+        PetasosNodeRDN siteRDN = getProcessingPlantNode().getNodeFDN().extractRDNForNodeType(PetasosNodeTypeEnum.SITE);
         String siteName = siteRDN.getNodeName();
         return (siteName);
     }

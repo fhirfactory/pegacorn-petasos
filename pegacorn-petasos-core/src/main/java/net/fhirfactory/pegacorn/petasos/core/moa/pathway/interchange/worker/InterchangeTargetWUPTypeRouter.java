@@ -21,14 +21,14 @@
  */
 package net.fhirfactory.pegacorn.petasos.core.moa.pathway.interchange.worker;
 
-import net.fhirfactory.pegacorn.common.model.componentid.TopologyNodeFDNToken;
+import net.fhirfactory.pegacorn.petasos.core.resources.node.datatypes.PetasosNodeToken;
 import net.fhirfactory.pegacorn.common.model.generalid.FDNToken;
 import net.fhirfactory.pegacorn.components.dataparcel.DataParcelManifest;
 import net.fhirfactory.pegacorn.deployment.topology.manager.TopologyIM;
 import net.fhirfactory.pegacorn.deployment.topology.model.nodes.WorkUnitProcessorTopologyNode;
+import net.fhirfactory.pegacorn.petasos.cache.manager.DataParcelSubscriptionMapIM;
 import net.fhirfactory.pegacorn.petasos.core.moa.pathway.naming.RouteElementNames;
 import net.fhirfactory.pegacorn.petasos.core.moa.resilience.processingplant.manager.ProcessingPlantResilienceActivityServicesController;
-import net.fhirfactory.pegacorn.petasos.datasets.manager.DataParcelSubscriptionMapIM;
 import net.fhirfactory.pegacorn.petasos.model.configuration.PetasosPropertyConstants;
 import net.fhirfactory.pegacorn.petasos.model.pathway.WorkUnitTransportPacket;
 import net.fhirfactory.pegacorn.petasos.model.pubsub.IntraSubsystemPubSubParticipantIdentifier;
@@ -88,8 +88,8 @@ public class InterchangeTargetWUPTypeRouter {
         LOG.trace(".forwardUoW2WUPs(): Retrieving the WUPTopologyNode from the camelExchange (Exchange) passed in");
         WorkUnitProcessorTopologyNode node = camelExchange.getProperty(PetasosPropertyConstants.WUP_TOPOLOGY_NODE_EXCHANGE_PROPERTY_NAME, WorkUnitProcessorTopologyNode.class);
         DataParcelManifest uowTopicID = null;
-        if (ingresPacket.getPayload().hasIngresContent()) {
-            uowTopicID = ingresPacket.getPayload().getIngresContent().getPayloadManifest();
+        if (ingresPacket.getTask().hasIngresContent()) {
+            uowTopicID = ingresPacket.getTask().getIngresContent().getPayloadManifest();
             LOG.trace(".forwardUoW2WUPs(): uowTopicId --> {}", uowTopicID);
         } else {
             LOG.debug(".forwardUoW2WUPs(): Exit, there's no payload (UoW), so return an empty list (and end this route).");
@@ -187,7 +187,7 @@ public class InterchangeTargetWUPTypeRouter {
         LOG.trace(".forwardUoW2WUPs(): The (LocalSubscriber aspect) Identifier->{}", localSubscriberIdentifier);
         WorkUnitProcessorTopologyNode currentNodeElement = (WorkUnitProcessorTopologyNode)topologyProxy.getNode(localSubscriberIdentifier);
         LOG.trace(".forwardUoW2WUPs(): The TopologyNode for the target subscriber->{}", currentNodeElement);
-        TopologyNodeFDNToken currentNodeToken = currentNodeElement.getNodeFDN().getToken();
+        PetasosNodeToken currentNodeToken = currentNodeElement.getNodeFDN().getToken();
         LOG.trace(".forwardUoW2WUPs(): The WUPToken for the target subscriber->{}", currentNodeElement);
         RouteElementNames routeName = new RouteElementNames(currentNodeToken);
         // Clone and Inject Message into Target Route
@@ -195,7 +195,7 @@ public class InterchangeTargetWUPTypeRouter {
         // Now check if the Subscriber is actually a remote one! If so, ensure it has a proper "IntendedTarget" entry
         if(hasRemoteServiceName(subscriber)){
             LOG.trace(".forwardPacket(): Has Remote Service as Target");
-            DataParcelManifest payloadTopicID = packet.getPayload().getPayloadTopicID();
+            DataParcelManifest payloadTopicID = packet.getTask().getPayloadTopicID();
             boolean hasEmptyIntendedTarget = StringUtils.isEmpty(payloadTopicID.getIntendedTargetSystem());
             boolean hasWildcardTarget = false;
             if(hasIntendedTarget(payloadTopicID)){
@@ -204,7 +204,7 @@ public class InterchangeTargetWUPTypeRouter {
             boolean hasRemoteElement = hasRemoteServiceName(subscriber);
             LOG.trace(".forwardPacket(): hasEmptyIntendedTarget->{}, hasWildcardTarget->{}, hasRemoteElement->{} ", hasEmptyIntendedTarget, hasWildcardTarget, hasRemoteElement);
             if((hasEmptyIntendedTarget || hasWildcardTarget) && hasRemoteElement){
-                clonedPacket.getPayload().getPayloadTopicID().setIntendedTargetSystem(subscriber.getInterSubsystemParticipant().getEndpointServiceName());
+                clonedPacket.getTask().getPayloadTopicID().setIntendedTargetSystem(subscriber.getInterSubsystemParticipant().getEndpointServiceName());
                 LOG.trace(".forwardPacket(): Setting the intendedTargetSystem->{}", subscriber.getInterSubsystemParticipant().getEndpointServiceName());
             }
         }
@@ -212,7 +212,7 @@ public class InterchangeTargetWUPTypeRouter {
         // targetSubscriberSet.add(routeName.getEndPointWUPContainerIngresProcessorIngres());
         // Now add the downstream WUPFunction to the Parcel Finalisation Registry
         WUPFunctionToken functionToken = new WUPFunctionToken(currentNodeElement.getNodeFunctionFDN().getFunctionToken());
-        activityServicesController.registerWUAEpisodeDownstreamWUPInterest(packet.getPacketID().getPresentEpisodeIdentifier(), functionToken);
+        activityServicesController.registerWUAEpisodeDownstreamWUPInterest(packet.getPacketID().getCurrentEpisodeID(), functionToken);
     }
 
     private void tracePrintSubscribedWUPSet(Set<WorkUnitProcessorTopologyNode> wupSet) {

@@ -27,8 +27,8 @@ import net.fhirfactory.pegacorn.petasos.core.moa.resilience.processingplant.cach
 import net.fhirfactory.pegacorn.petasos.core.moa.resilience.processingplant.manager.tasks.RegisterNewMOAWorkUnitActivityTask;
 import net.fhirfactory.pegacorn.petasos.core.moa.resilience.processingplant.manager.tasks.SynchroniseMOAWorkUnitActivityJobCardTask;
 import net.fhirfactory.pegacorn.petasos.model.resilience.episode.PetasosEpisodeIdentifier;
-import net.fhirfactory.pegacorn.petasos.model.resilience.activitymatrix.moa.ParcelStatusElement;
-import net.fhirfactory.pegacorn.petasos.model.resilience.parcel.ResilienceParcelIdentifier;
+import net.fhirfactory.pegacorn.petasos.model.resilience.activitymatrix.moa.PetasosTaskStatusElement;
+import net.fhirfactory.pegacorn.petasos.core.resources.task.datatypes.PetasosTaskToken;
 import net.fhirfactory.pegacorn.petasos.model.wup.WUPFunctionToken;
 import net.fhirfactory.pegacorn.petasos.model.wup.WUPJobCard;
 import org.slf4j.Logger;
@@ -59,12 +59,12 @@ public class ProcessingPlantResilienceActivityServicesController {
     SynchroniseMOAWorkUnitActivityJobCardTask taskSynchroniseWUA;
 
 
-    public ParcelStatusElement registerNewWorkUnitActivity(WUPJobCard jobCard) {
+    public PetasosTaskStatusElement registerNewWorkUnitActivity(WUPJobCard jobCard) {
         LOG.debug(".registerNewWorkUnitActivity(): Entry, activityID --> {}, statusEnum --> {}", jobCard);
         if (jobCard == null) {
             return (null);
         }
-        ParcelStatusElement parcelStatusElement = wuaRegistry.registerNewWUA(jobCard);
+        PetasosTaskStatusElement parcelStatusElement = wuaRegistry.registerNewWUA(jobCard);
         synchroniseJobCard(jobCard);
         LOG.debug(".registerNewWorkUnitActivity(): Exit, parcelStatusElement --> {}", parcelStatusElement);
         return (parcelStatusElement);
@@ -79,9 +79,9 @@ public class ProcessingPlantResilienceActivityServicesController {
 
 
 
-    public ParcelStatusElement getStatusElement(ResilienceParcelIdentifier parcelInstanceID){
+    public PetasosTaskStatusElement getStatusElement(PetasosTaskToken parcelInstanceID){
         LOG.debug(".getStatusElement(): Entry, parcelInstanceID --> {}", parcelInstanceID);
-        ParcelStatusElement retrievedElement = activityMatrixDM.getParcelStatusElement(parcelInstanceID);
+        PetasosTaskStatusElement retrievedElement = activityMatrixDM.getParcelStatusElement(parcelInstanceID);
         LOG.debug(".getStatusElement(): Exit, retrievedElement --> {}", retrievedElement);
         return(retrievedElement);
     }

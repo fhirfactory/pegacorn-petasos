@@ -22,11 +22,12 @@
     </properties>
     
     <modules>
+	<module>../pegacorn-petasos-resources</module>
         <module>../pegacorn-petasos-model</module>
-        <module>../pegacorn-petasos-datasets</module>
+        <!--module>../pegacorn-petasos-datasets</module-->
         <module>../pegacorn-petasos-core</module>
         <module>../pegacorn-petasos-audit</module>
-        <module>../pegacorn-petasos-caches</module>
+        <module>../pegacorn-petasos-cachemaps</module>
         <module>../pegacorn-petasos-edge</module>
         <module>../pegacorn-petasos-processingplant</module>
         <module>../pegacorn-petasos-workshop</module>

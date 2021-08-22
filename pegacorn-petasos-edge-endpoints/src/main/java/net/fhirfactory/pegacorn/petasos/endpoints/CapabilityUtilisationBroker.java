@@ -21,11 +21,9 @@
  */
 package net.fhirfactory.pegacorn.petasos.endpoints;
 
-import net.fhirfactory.pegacorn.components.capabilities.base.CapabilityUtilisationRequest;
-import net.fhirfactory.pegacorn.components.capabilities.base.CapabilityUtilisationResponse;
-import net.fhirfactory.pegacorn.components.capabilities.hl7v2tasks.A19QueryTask;
-import net.fhirfactory.pegacorn.components.capabilities.hl7v2tasks.A19QueryTaskOutcome;
-import net.fhirfactory.pegacorn.components.capabilities.CapabilityUtilisationBrokerInterface;
+import net.fhirfactory.pegacorn.petasos.model.capabilities.base.CapabilityUtilisationRequest;
+import net.fhirfactory.pegacorn.petasos.model.capabilities.base.CapabilityUtilisationResponse;
+import net.fhirfactory.pegacorn.petasos.model.capabilities.CapabilityUtilisationBrokerInterface;
 import net.fhirfactory.pegacorn.petasos.endpoints.technologies.jgroups.ipc.PetasosInterZoneIPCEndpoint;
 import net.fhirfactory.pegacorn.petasos.endpoints.technologies.jgroups.ipc.PetasosIntraZoneIPCEndpoint;
 import org.slf4j.Logger;

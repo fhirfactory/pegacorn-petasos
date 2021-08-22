@@ -21,10 +21,10 @@
  */
 package net.fhirfactory.pegacorn.petasos.endpoints.technologies.helpers;
 
-import net.fhirfactory.pegacorn.common.model.componentid.TopologyNodeFDN;
-import net.fhirfactory.pegacorn.common.model.componentid.TopologyNodeFDNToken;
-import net.fhirfactory.pegacorn.common.model.componentid.TopologyNodeRDN;
-import net.fhirfactory.pegacorn.common.model.componentid.TopologyNodeTypeEnum;
+import net.fhirfactory.pegacorn.petasos.core.resources.node.datatypes.PetasosNodeFDN;
+import net.fhirfactory.pegacorn.petasos.core.resources.node.datatypes.PetasosNodeToken;
+import net.fhirfactory.pegacorn.petasos.core.resources.node.datatypes.PetasosNodeRDN;
+import net.fhirfactory.pegacorn.petasos.core.resources.node.valuesets.PetasosNodeTypeEnum;
 import net.fhirfactory.pegacorn.components.interfaces.topology.ProcessingPlantInterface;
 import net.fhirfactory.pegacorn.deployment.names.functionality.base.PegacornCommonInterfaceNames;
 import net.fhirfactory.pegacorn.deployment.topology.manager.TopologyIM;
@@ -332,7 +332,7 @@ public class JGroupsBasedParticipantInformationService {
     // Deriving My Role
     //
 
-    protected TopologyNodeFDNToken deriveAssociatedForwarderFDNToken(PetasosEndpointChannelScopeEnum forwarderScope){
+    protected PetasosNodeToken deriveAssociatedForwarderFDNToken(PetasosEndpointChannelScopeEnum forwarderScope){
         getLogger().info(".deriveAssociatedForwarderFDNToken(): Entry");
         String forwarderName;
         switch(forwarderScope){
@@ -347,10 +347,10 @@ public class JGroupsBasedParticipantInformationService {
                 forwarderName = INTRAZONE_EDGE_FORWARDER_WUP_NAME;
                 break;
         }
-        TopologyNodeFDN workshopNodeFDN = deriveWorkshopFDN();
-        TopologyNodeFDN wupNodeFDN = SerializationUtils.clone(workshopNodeFDN);
-        wupNodeFDN.appendTopologyNodeRDN(new TopologyNodeRDN(TopologyNodeTypeEnum.WUP, forwarderName, EDGE_FORWARDER_WUP_VERSION));
-        TopologyNodeFDNToken associatedForwarderWUPToken = wupNodeFDN.getToken();
+        PetasosNodeFDN workshopNodeFDN = deriveWorkshopFDN();
+        PetasosNodeFDN wupNodeFDN = SerializationUtils.clone(workshopNodeFDN);
+        wupNodeFDN.appendTopologyNodeRDN(new PetasosNodeRDN(PetasosNodeTypeEnum.WUP, forwarderName, EDGE_FORWARDER_WUP_VERSION));
+        PetasosNodeToken associatedForwarderWUPToken = wupNodeFDN.getToken();
         return(associatedForwarderWUPToken);
     }
 
@@ -360,7 +360,7 @@ public class JGroupsBasedParticipantInformationService {
 
     protected StandardEdgeIPCEndpoint deriveTopologyEndpoint(PetasosTopologyEndpointTypeEnum requiredEndpointType, String interfaceName){
         getLogger().info(".deriveIPCTopologyEndpoint(): Entry, requiredEndpointType->{}, interfaceName->{}", requiredEndpointType, interfaceName);
-        for(TopologyNodeFDN currentEndpointFDN: getProcessingPlant().getProcessingPlantNode().getEndpoints()){
+        for(PetasosNodeFDN currentEndpointFDN: getProcessingPlant().getProcessingPlantNode().getEndpoints()){
             IPCTopologyEndpoint currentEndpoint = (IPCTopologyEndpoint)getTopologyIM().getNode(currentEndpointFDN);
             getLogger().info(".deriveIPCTopologyEndpoint(): currentEndpoint->{}",currentEndpoint);
             PetasosTopologyEndpointTypeEnum endpointType = currentEndpoint.getEndpointType();
@@ -389,13 +389,13 @@ public class JGroupsBasedParticipantInformationService {
         }
         // 1st, the IntraSubsystem Pub/Sub Participant} component
         getLogger().info(".initialise(): Now create my intraSubsystemParticipant (LocalPubSubPublisher)");
-        TopologyNodeFDNToken topologyNodeFDNToken = deriveAssociatedForwarderFDNToken(petasosEndpoint.getEndpointScope());
-        if(topologyNodeFDNToken == null){
+        PetasosNodeToken petasosNodeToken = deriveAssociatedForwarderFDNToken(petasosEndpoint.getEndpointScope());
+        if(petasosNodeToken == null){
             getLogger().info(".buildParticipant(): Exit, unable to resolve associatedForwarderFDNToken");
             return(null);
         }
-        getLogger().info(".initialise(): localPublisher TopologyNodeFDNToken is ->{}", topologyNodeFDNToken);
-        IntraSubsystemPubSubParticipant intraSubsystemParticipant = new IntraSubsystemPubSubParticipant(topologyNodeFDNToken);
+        getLogger().info(".initialise(): localPublisher TopologyNodeFDNToken is ->{}", petasosNodeToken);
+        IntraSubsystemPubSubParticipant intraSubsystemParticipant = new IntraSubsystemPubSubParticipant(petasosNodeToken);
         getLogger().info(".initialise(): intraSubsystemParticipant created -->{}", intraSubsystemParticipant);
         getLogger().info(".initialise(): Now create my PubSubParticipant");
         PubSubParticipant participant = new PubSubParticipant();
@@ -480,10 +480,10 @@ public class JGroupsBasedParticipantInformationService {
     // Building the FDN
     //
 
-    private TopologyNodeFDN deriveWorkshopFDN() {
-        TopologyNodeFDN processingPlantFDN = getProcessingPlant().getProcessingPlantNode().getNodeFDN();
-        TopologyNodeFDN futureWorkshopFDN = SerializationUtils.clone(processingPlantFDN);
-        TopologyNodeRDN newRDN = new TopologyNodeRDN(TopologyNodeTypeEnum.WORKSHOP, DefaultWorkshopSetEnum.EDGE_WORKSHOP.getWorkshop(), getProcessingPlant().getProcessingPlantNode().getNodeRDN().getNodeVersion());
+    private PetasosNodeFDN deriveWorkshopFDN() {
+        PetasosNodeFDN processingPlantFDN = getProcessingPlant().getProcessingPlantNode().getNodeFDN();
+        PetasosNodeFDN futureWorkshopFDN = SerializationUtils.clone(processingPlantFDN);
+        PetasosNodeRDN newRDN = new PetasosNodeRDN(PetasosNodeTypeEnum.WORKSHOP, DefaultWorkshopSetEnum.EDGE_WORKSHOP.getWorkshop(), getProcessingPlant().getProcessingPlantNode().getNodeRDN().getNodeVersion());
         futureWorkshopFDN.appendTopologyNodeRDN(newRDN);
         return(futureWorkshopFDN);
     }

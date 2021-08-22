@@ -24,7 +24,7 @@ package net.fhirfactory.pegacorn.petasos.audit.brokers;
 import net.fhirfactory.pegacorn.petasos.audit.transformers.DefaultResilienceParcel2FHIRAuditEvent;
 import net.fhirfactory.pegacorn.petasos.model.audit.PetasosParcelAuditTrailEntry;
 import net.fhirfactory.pegacorn.petasos.model.resilience.parcel.ResilienceParcel;
-import net.fhirfactory.pegacorn.services.audit.logger.StandardAuditEntryLoggerService;
+import net.fhirfactory.pegacorn.petasos.audit.logger.StandardAuditEntryLoggerService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

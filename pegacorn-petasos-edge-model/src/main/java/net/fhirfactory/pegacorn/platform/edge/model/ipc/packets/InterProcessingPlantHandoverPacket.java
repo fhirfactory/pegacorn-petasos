@@ -22,7 +22,7 @@
 package net.fhirfactory.pegacorn.platform.edge.model.ipc.packets;
 
 import net.fhirfactory.pegacorn.petasos.model.pathway.ActivityID;
-import net.fhirfactory.pegacorn.petasos.model.uow.UoW;
+import net.fhirfactory.pegacorn.petasos.core.payloads.uow.UoW;
 
 import java.io.Serializable;
 import java.util.Date;

@@ -1,9 +1,9 @@
 package net.fhirfactory.pegacorn.petasos.core.sta.wup.common;
 
 import ca.uhn.fhir.parser.IParser;
-import net.fhirfactory.pegacorn.common.model.componentid.TopologyNodeFDN;
-import net.fhirfactory.pegacorn.common.model.componentid.TopologyNodeFunctionFDNToken;
-import net.fhirfactory.pegacorn.common.model.componentid.TopologyNodeTypeEnum;
+import net.fhirfactory.pegacorn.petasos.core.resources.node.datatypes.PetasosNodeFDN;
+import net.fhirfactory.pegacorn.petasos.core.resources.node.datatypes.PetasosNodeFunctionFDNToken;
+import net.fhirfactory.pegacorn.petasos.core.resources.node.valuesets.PetasosNodeTypeEnum;
 import net.fhirfactory.pegacorn.components.interfaces.topology.PegacornTopologyFactoryInterface;
 import net.fhirfactory.pegacorn.components.interfaces.topology.ProcessingPlantInterface;
 import net.fhirfactory.pegacorn.deployment.topology.manager.TopologyIM;
@@ -75,9 +75,9 @@ public abstract class GenericSTAWUPTemplate {
      */
     private WorkUnitProcessorTopologyNode buildSTAClientNode() {
         getLogger().debug(".buildSTAClientNode(): Entry");
-        TopologyNodeFDN staClientTypeFDN = new TopologyNodeFDN(getWorkshop().getNodeFDN());
+        PetasosNodeFDN staClientTypeFDN = new PetasosNodeFDN(getWorkshop().getNodeFDN());
         getLogger().trace(".buildSTAClientNode(): Now construct the Work Unit Processing Node");
-        WorkUnitProcessorTopologyNode wup = getTopologyFactory().createWorkUnitProcessor(specifySTAClientName(), specifySTAClientVersion(),getWorkshop(), TopologyNodeTypeEnum.WUP);
+        WorkUnitProcessorTopologyNode wup = getTopologyFactory().createWorkUnitProcessor(specifySTAClientName(), specifySTAClientVersion(),getWorkshop(), PetasosNodeTypeEnum.WUP);
         getLogger().trace(".buildSTAClientNode(): Constructing WUP Node, Setting Concurrency Mode");
         wup.setConcurrencyMode(getWorkshop().getConcurrencyMode());
         getLogger().trace(".buildSTAClientNode(): Constructing WUP Node, Setting Resillience Mode");
@@ -88,7 +88,7 @@ public abstract class GenericSTAWUPTemplate {
         return (wup);
     }
 
-    public TopologyNodeFunctionFDNToken getApiClientNodeFunction() {
+    public PetasosNodeFunctionFDNToken getApiClientNodeFunction() {
         return getWUP().getNodeFunctionFDN().getFunctionToken();
     }
 

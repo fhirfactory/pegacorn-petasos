@@ -21,11 +21,8 @@
  */
 package net.fhirfactory.pegacorn.petasos.endpoints.technologies.jgroups.ipc.base;
 
-import net.fhirfactory.pegacorn.components.capabilities.base.CapabilityUtilisationRequest;
-import net.fhirfactory.pegacorn.components.capabilities.base.CapabilityUtilisationResponse;
-import net.fhirfactory.pegacorn.components.capabilities.hl7v2tasks.A19QueryCapabilityFulfillmentInterface;
-import net.fhirfactory.pegacorn.components.capabilities.hl7v2tasks.A19QueryTask;
-import net.fhirfactory.pegacorn.components.capabilities.hl7v2tasks.A19QueryTaskOutcome;
+import net.fhirfactory.pegacorn.petasos.model.capabilities.base.CapabilityUtilisationRequest;
+import net.fhirfactory.pegacorn.petasos.model.capabilities.base.CapabilityUtilisationResponse;
 import net.fhirfactory.pegacorn.petasos.endpoints.technologies.datatypes.PetasosAdapterAddress;
 import net.fhirfactory.pegacorn.petasos.endpoints.technologies.jgroups.base.JGroupsPetasosEndpointBase;
 import net.fhirfactory.pegacorn.platform.edge.model.ipc.packets.InterProcessingPlantHandoverPacket;
@@ -38,7 +35,6 @@ import org.jgroups.Address;
 import org.jgroups.blocks.RequestOptions;
 import org.jgroups.blocks.ResponseMode;
 
-import javax.inject.Inject;
 import java.util.ArrayList;
 import java.util.List;
 

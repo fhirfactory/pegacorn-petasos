@@ -1,9 +1,9 @@
 package net.fhirfactory.pegacorn.wups.archetypes.unmanaged;
 
 import ca.uhn.fhir.parser.IParser;
-import net.fhirfactory.pegacorn.common.model.componentid.TopologyNodeFunctionFDN;
-import net.fhirfactory.pegacorn.common.model.componentid.TopologyNodeFunctionFDNToken;
-import net.fhirfactory.pegacorn.common.model.componentid.TopologyNodeTypeEnum;
+import net.fhirfactory.pegacorn.petasos.core.resources.node.datatypes.PetasosNodeFunctionFDN;
+import net.fhirfactory.pegacorn.petasos.core.resources.node.datatypes.PetasosNodeFunctionFDNToken;
+import net.fhirfactory.pegacorn.petasos.core.resources.node.valuesets.PetasosNodeTypeEnum;
 import net.fhirfactory.pegacorn.components.dataparcel.DataParcelManifest;
 import net.fhirfactory.pegacorn.components.dataparcel.DataParcelTypeDescriptor;
 import net.fhirfactory.pegacorn.components.dataparcel.valuesets.DataParcelTypeEnum;
@@ -19,8 +19,8 @@ import net.fhirfactory.pegacorn.internals.fhir.r4.resources.identifier.PegacornI
 import net.fhirfactory.pegacorn.internals.fhir.r4.resources.identifier.PegacornIdentifierFactory;
 import net.fhirfactory.pegacorn.petasos.model.pathway.ActivityID;
 import net.fhirfactory.pegacorn.petasos.model.resilience.activitymatrix.sta.TransactionStatusElement;
-import net.fhirfactory.pegacorn.petasos.model.uow.UoW;
-import net.fhirfactory.pegacorn.petasos.model.uow.UoWPayload;
+import net.fhirfactory.pegacorn.petasos.core.payloads.uow.UoW;
+import net.fhirfactory.pegacorn.petasos.core.payloads.uow.UoWPayload;
 import net.fhirfactory.pegacorn.petasos.model.wup.WUPActivityStatusEnum;
 import net.fhirfactory.pegacorn.petasos.model.wup.WUPIdentifier;
 import net.fhirfactory.pegacorn.petasos.model.wup.WUPJobCard;
@@ -93,7 +93,7 @@ public abstract class NonResilientWithAuditTrailWUP {
     private void buildWUPNodeElement(){
         getLogger().debug(".buildWUPNodeElement(): Entry");
         WorkUnitProcessorTopologyNode wupNode = getTopologyFactory()
-                .createWorkUnitProcessor(specifyWUPInstanceName(),specifyWUPInstanceVersion(), getWorkshop().getWorkshopNode(), TopologyNodeTypeEnum.WUP);
+                .createWorkUnitProcessor(specifyWUPInstanceName(),specifyWUPInstanceVersion(), getWorkshop().getWorkshopNode(), PetasosNodeTypeEnum.WUP);
         getTopologyIM().addTopologyNode(specifyWorkshop().getWorkshopNode().getNodeFDN(), wupNode);
         wupNode.setResilienceMode(specifyWorkshop().getWorkshopNode().getResilienceMode());
         wupNode.setConcurrencyMode(specifyWorkshop().getWorkshopNode().getConcurrencyMode());
@@ -104,11 +104,11 @@ public abstract class NonResilientWithAuditTrailWUP {
     // Getters and Setters
     //
 
-    public TopologyNodeFunctionFDN getNodeFunctionFDN(){
+    public PetasosNodeFunctionFDN getNodeFunctionFDN(){
         return(topologyNode.getNodeFunctionFDN());
     }
 
-    public TopologyNodeFunctionFDNToken getNodeFunctionFDNToken(){
+    public PetasosNodeFunctionFDNToken getNodeFunctionFDNToken(){
         return(topologyNode.getNodeFunctionFDN().getFunctionToken());
     }
 
@@ -165,7 +165,7 @@ public abstract class NonResilientWithAuditTrailWUP {
     protected void initialiseWUPActivity(boolean resilientActivity){
         ActivityID activityID = new ActivityID();
         activityID.setResilientActivity(resilientActivity);
-        activityID.setPresentWUPFunctionToken(getNodeFunctionFDN().getFunctionToken());
+        activityID.setCurrentDeliveredCapability(getNodeFunctionFDN().getFunctionToken());
         activityID.setPresentWUPIdentifier(getNodeInstanceID());
         ConcurrencyModeEnum concurrencyMode = this.topologyNode.getConcurrencyMode();
         ResilienceModeEnum resilienceMode = this.topologyNode.getResilienceMode();

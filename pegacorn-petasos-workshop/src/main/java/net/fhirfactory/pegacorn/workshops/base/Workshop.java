@@ -21,9 +21,9 @@
  */
 package net.fhirfactory.pegacorn.workshops.base;
 
-import net.fhirfactory.pegacorn.common.model.componentid.TopologyNodeFDN;
-import net.fhirfactory.pegacorn.common.model.componentid.TopologyNodeRDN;
-import net.fhirfactory.pegacorn.common.model.componentid.TopologyNodeTypeEnum;
+import net.fhirfactory.pegacorn.petasos.core.resources.node.datatypes.PetasosNodeFDN;
+import net.fhirfactory.pegacorn.petasos.core.resources.node.datatypes.PetasosNodeRDN;
+import net.fhirfactory.pegacorn.petasos.core.resources.node.valuesets.PetasosNodeTypeEnum;
 import net.fhirfactory.pegacorn.components.interfaces.topology.PegacornTopologyFactoryInterface;
 import net.fhirfactory.pegacorn.components.interfaces.topology.ProcessingPlantInterface;
 import net.fhirfactory.pegacorn.components.interfaces.topology.WorkshopInterface;
@@ -62,7 +62,7 @@ public abstract class Workshop extends RouteBuilder implements WorkshopInterface
 
     abstract protected String specifyWorkshopName();
     abstract protected String specifyWorkshopVersion();
-    abstract protected TopologyNodeTypeEnum specifyWorkshopType();
+    abstract protected PetasosNodeTypeEnum specifyWorkshopType();
     abstract protected void invokePostConstructInitialisation();
 
     protected PegacornTopologyFactoryInterface getTopologyFactory(){
@@ -125,9 +125,9 @@ public abstract class Workshop extends RouteBuilder implements WorkshopInterface
         getLogger().debug(".getWUP(): Entry, wupName --> {}, wupVersion --> {}", wupName, wupVersion);
         boolean found = false;
         WorkUnitProcessorTopologyNode foundWorkshop = null;
-        for (TopologyNodeFDN containedWorkshopFDN : this.workshopNode.getWupSet()) {
+        for (PetasosNodeFDN containedWorkshopFDN : this.workshopNode.getWupSet()) {
             WorkUnitProcessorTopologyNode containedWorkshop = (WorkUnitProcessorTopologyNode)topologyIM.getNode(containedWorkshopFDN);
-            TopologyNodeRDN testRDN = new TopologyNodeRDN(TopologyNodeTypeEnum.WORKSHOP, wupName, wupVersion);
+            PetasosNodeRDN testRDN = new PetasosNodeRDN(PetasosNodeTypeEnum.WORKSHOP, wupName, wupVersion);
             if (testRDN.equals(containedWorkshop.getNodeRDN())) {
                 found = true;
                 foundWorkshop = containedWorkshop;

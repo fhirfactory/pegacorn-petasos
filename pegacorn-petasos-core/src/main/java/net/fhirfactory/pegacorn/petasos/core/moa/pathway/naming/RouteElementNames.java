@@ -22,7 +22,10 @@
 
 package net.fhirfactory.pegacorn.petasos.core.moa.pathway.naming;
 
-import net.fhirfactory.pegacorn.common.model.componentid.*;
+import net.fhirfactory.pegacorn.petasos.core.resources.node.datatypes.PetasosNodeFDN;
+import net.fhirfactory.pegacorn.petasos.core.resources.node.datatypes.PetasosNodeRDN;
+import net.fhirfactory.pegacorn.petasos.core.resources.node.datatypes.PetasosNodeToken;
+import net.fhirfactory.pegacorn.petasos.core.resources.node.valuesets.PetasosNodeTypeEnum;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -35,7 +38,7 @@ import org.slf4j.LoggerFactory;
 public class RouteElementNames {
     private static final Logger LOG = LoggerFactory.getLogger(RouteElementNames.class);
 
-    private TopologyNodeFDNToken nodeFDNToken;
+    private PetasosNodeToken nodeFDNToken;
     private boolean mustBeDirect;
     private String wupTypeName;
     private String wupVersion;
@@ -43,14 +46,14 @@ public class RouteElementNames {
     private static final String DIRECT_INTER_FUNCTION_DIRECT_TYPE = "direct:";
     private static final String SEDA_INTER_FUNCTION_DIRECT_TYPE = "seda:";
 
-    public RouteElementNames(TopologyNodeFDNToken functionToken, boolean mustBeDirect){
+    public RouteElementNames(PetasosNodeToken functionToken, boolean mustBeDirect){
         LOG.debug(".RouteElementNames(): Entry, functionToken->{}, mustBeDirect->{}", functionToken, mustBeDirect);
         this.nodeFDNToken = functionToken;
         this.wupTypeName = simplifyName();
         this.mustBeDirect = mustBeDirect;
     }
 
-    public RouteElementNames(TopologyNodeFDNToken functionToken){
+    public RouteElementNames(PetasosNodeToken functionToken){
         LOG.debug(".RouteElementNames(): Entry, functionToken->{}", functionToken);
         this.nodeFDNToken = functionToken;
         this.wupTypeName = simplifyName();
@@ -59,13 +62,13 @@ public class RouteElementNames {
 
     public String simplifyName(){
         LOG.debug(".simplifyName(): Entry, this.nodeFDNToken --> {}", this.nodeFDNToken);
-        TopologyNodeFDN wupFunctionFDN = new TopologyNodeFDN(this.nodeFDNToken);
+        PetasosNodeFDN wupFunctionFDN = new PetasosNodeFDN(this.nodeFDNToken);
         LOG.trace(".simplifyName(): wupFunctionFDN --> {}", wupFunctionFDN);
-        TopologyNodeRDN processingPlantRDN = wupFunctionFDN.extractRDNForNodeType(TopologyNodeTypeEnum.PROCESSING_PLANT);
+        PetasosNodeRDN processingPlantRDN = wupFunctionFDN.extractRDNForNodeType(PetasosNodeTypeEnum.PROCESSING_PLANT);
         LOG.trace(".simplifyName(): processingPlantRDN (RDN) --> {} ", processingPlantRDN);
-        TopologyNodeRDN workshopRDN = wupFunctionFDN.extractRDNForNodeType(TopologyNodeTypeEnum.WORKSHOP);
+        PetasosNodeRDN workshopRDN = wupFunctionFDN.extractRDNForNodeType(PetasosNodeTypeEnum.WORKSHOP);
         LOG.trace(".simplifyName(): workshopRDN (RDN) --> {} ", workshopRDN);
-        TopologyNodeRDN wupFunctionRDN = wupFunctionFDN.extractRDNForNodeType(TopologyNodeTypeEnum.WUP);
+        PetasosNodeRDN wupFunctionRDN = wupFunctionFDN.extractRDNForNodeType(PetasosNodeTypeEnum.WUP);
         LOG.trace(".simplifyName(): wupFunctionRDN (RDN) --> {}", wupFunctionRDN);
         String nodeVersion = wupFunctionRDN.getNodeVersion();
         String nodeVersionSimplified = nodeVersion.replace(".","");

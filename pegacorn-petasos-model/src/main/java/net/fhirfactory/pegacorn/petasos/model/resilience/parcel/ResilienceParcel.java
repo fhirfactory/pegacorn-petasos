@@ -21,14 +21,15 @@
  */
 package net.fhirfactory.pegacorn.petasos.model.resilience.parcel;
 
-import net.fhirfactory.pegacorn.common.model.componentid.TopologyNodeFunctionFDN;
+import net.fhirfactory.pegacorn.petasos.core.resources.node.datatypes.PetasosNodeFunctionFDN;
 import net.fhirfactory.pegacorn.common.model.generalid.FDN;
 import net.fhirfactory.pegacorn.common.model.generalid.FDNToken;
 import net.fhirfactory.pegacorn.internals.SerializableObject;
 import net.fhirfactory.pegacorn.petasos.model.pathway.ActivityID;
 import net.fhirfactory.pegacorn.petasos.model.resilience.episode.PetasosEpisodeIdentifier;
-import net.fhirfactory.pegacorn.petasos.model.uow.UoW;
+import net.fhirfactory.pegacorn.petasos.core.payloads.uow.UoW;
 import net.fhirfactory.pegacorn.petasos.model.wup.WUPIdentifier;
+import net.fhirfactory.pegacorn.petasos.core.resources.task.datatypes.PetasosTaskToken;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -46,7 +47,7 @@ public class ResilienceParcel implements Serializable {
 
     private static final Logger LOG = LoggerFactory.getLogger(ResilienceParcel.class);
 
-    private ResilienceParcelIdentifier identifier;
+    private PetasosTaskToken identifier;
     private SerializableObject instanceIDLock;
     private FDNToken typeID;
     private SerializableObject typeIDLock;
@@ -116,7 +117,7 @@ public class ResilienceParcel implements Serializable {
         this.identifier = this.buildParcelInstanceIdentifier(activityID, theUoW);
         this.actualUoW = theUoW;
         this.downstreamEpisodeIdentifierSet = new HashSet<PetasosEpisodeIdentifier>();
-        this.upstreamEpisodeIdentifier = activityID.getPreviousEpisodeIdentifier();
+        this.upstreamEpisodeIdentifier = activityID.getUpstreamEpisodeID();
         this.registrationDate = Date.from(Instant.now());
         this.finalisationStatus = ResilienceParcelFinalisationStatusEnum.PARCEL_FINALISATION_STATUS_NOT_FINALISED;
     }
@@ -304,11 +305,11 @@ public class ResilienceParcel implements Serializable {
         return (true);
     }
 
-    public ResilienceParcelIdentifier getIdentifier() {
+    public PetasosTaskToken getIdentifier() {
         return this.identifier;
     }
 
-    public void setIdentifier(ResilienceParcelIdentifier parcelInstance) {
+    public void setIdentifier(PetasosTaskToken parcelInstance) {
         synchronized (instanceIDLock) {
             this.identifier = parcelInstance;
         }
@@ -603,7 +604,7 @@ public class ResilienceParcel implements Serializable {
         }
         FDN newEpisodeID;
         if (activityID.hasPresentWUPFunctionToken()) {
-            TopologyNodeFunctionFDN nodeFunctionFDN = new TopologyNodeFunctionFDN(activityID.getPresentWUPFunctionToken());
+            PetasosNodeFunctionFDN nodeFunctionFDN = new PetasosNodeFunctionFDN(activityID.getCurrentDeliveredCapability());
             newEpisodeID = nodeFunctionFDN.toTypeBasedFDNWithVersion();
         } else {
             throw (new IllegalArgumentException(".buildEpisodeID(): ActivityID has no PresentWUPTypeID value, bad parameter"));
@@ -628,7 +629,7 @@ public class ResilienceParcel implements Serializable {
         }
         FDN newTypeID;
         if (activityID.hasPresentWUPFunctionToken()) {
-            TopologyNodeFunctionFDN nodeFunctionFDN = new TopologyNodeFunctionFDN(activityID.getPresentWUPFunctionToken());
+            PetasosNodeFunctionFDN nodeFunctionFDN = new PetasosNodeFunctionFDN(activityID.getCurrentDeliveredCapability());
             newTypeID = nodeFunctionFDN.toTypeBasedFDNWithVersion();
         } else {
             throw (new IllegalArgumentException(".buildEpisodeID(): ActivityID has no PresentWUPTypeID value, bad parameter"));
@@ -637,7 +638,7 @@ public class ResilienceParcel implements Serializable {
         return (newTypeID.getToken());
     }
 
-    public ResilienceParcelIdentifier buildParcelInstanceIdentifier(ActivityID activityID, UoW theUoW) {
+    public PetasosTaskToken buildParcelInstanceIdentifier(ActivityID activityID, UoW theUoW) {
         if (theUoW == null) {
             throw (new IllegalArgumentException(".buildEpisodeID(): null UoW passed as parameter"));
         }
@@ -657,7 +658,7 @@ public class ResilienceParcel implements Serializable {
             throw (new IllegalArgumentException(".buildEpisodeID(): ActivityID has no PresentWUPInstanceID value, bad parameter"));
         }
         newInstanceID.appendFDN(uowInstanceFDN);
-        ResilienceParcelIdentifier parcelIdentifier = new ResilienceParcelIdentifier(newInstanceID.getToken());
+        PetasosTaskToken parcelIdentifier = new PetasosTaskToken(newInstanceID.getToken());
         return (parcelIdentifier);
     }
 }

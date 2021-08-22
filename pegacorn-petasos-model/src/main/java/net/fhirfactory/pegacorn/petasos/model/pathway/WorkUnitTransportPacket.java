@@ -22,10 +22,9 @@
 
 package net.fhirfactory.pegacorn.petasos.model.pathway;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import net.fhirfactory.pegacorn.internals.SerializableObject;
-import net.fhirfactory.pegacorn.petasos.model.resilience.activitymatrix.moa.ParcelStatusElement;
-import net.fhirfactory.pegacorn.petasos.model.uow.UoW;
+import net.fhirfactory.pegacorn.petasos.core.resources.task.PetasosTask;
+import net.fhirfactory.pegacorn.petasos.model.resilience.activitymatrix.moa.PetasosTaskStatusElement;
 
 import java.io.Serializable;
 import java.util.Date;
@@ -47,16 +46,16 @@ public class WorkUnitTransportPacket implements Serializable {
     private SerializableObject isARetryLock;
     private WUPJobCard currentJobCard;
     private SerializableObject currentJobCardLock;
-    private ParcelStatusElement currentParcelStatus;
+    private PetasosTaskStatusElement currentParcelStatus;
     private SerializableObject currentParcelStatusLock;
-    private UoW payload;
+    private PetasosTask task;
     private SerializableObject payloadLock;
     private String generatedString;
     private SerializableObject generatedStringLock;
     
-    public WorkUnitTransportPacket(ActivityID newPacketID, Date senderSendDate, UoW payload) {
+    public WorkUnitTransportPacket(ActivityID newPacketID, Date senderSendDate, PetasosTask payload) {
         this.senderSendDate = senderSendDate;
-        this.payload = payload;
+        this.task = payload;
         this.packetID = newPacketID;
         this.isARetry = false;
         this.currentJobCard = null;
@@ -74,7 +73,7 @@ public class WorkUnitTransportPacket implements Serializable {
 
     public WorkUnitTransportPacket(WorkUnitTransportPacket originalPacket) {
         this.senderSendDate = null;
-        this.payload = null;
+        this.task = null;
         this.packetID = null;
         this.isARetry = false;
         this.currentJobCard = null;
@@ -102,7 +101,7 @@ public class WorkUnitTransportPacket implements Serializable {
             this.currentParcelStatus = originalPacket.getCurrentParcelStatus();
         }
         if(originalPacket.hasPayload()) {
-            this.payload = originalPacket.getPayload();
+            this.task = originalPacket.getTask();
         }
         generateString();
     }
@@ -153,11 +152,11 @@ public class WorkUnitTransportPacket implements Serializable {
         }
     }
 
-    public ParcelStatusElement getCurrentParcelStatus() {
+    public PetasosTaskStatusElement getCurrentParcelStatus() {
         return currentParcelStatus;
     }
 
-    public void setCurrentParcelStatus(ParcelStatusElement currentParcelStatus) {
+    public void setCurrentParcelStatus(PetasosTaskStatusElement currentParcelStatus) {
         synchronized (currentParcelStatusLock) {
             this.currentParcelStatus = currentParcelStatus;
             generateString();
@@ -208,20 +207,20 @@ public class WorkUnitTransportPacket implements Serializable {
     // Payload helper/bean methods
 
     public boolean hasPayload(){
-        if(this.payload==null){
+        if(this.task ==null){
             return(false);
         } else {
             return(true);
         }
     }
     
-    public UoW getPayload() {
-        return payload;
+    public PetasosTask getTask() {
+        return task;
     }
 
-    public void setPayload(UoW payload) {
+    public void setTask(PetasosTask task) {
         synchronized (payloadLock) {
-            this.payload = payload;
+            this.task = task;
             generateString();
         }
     }
@@ -236,7 +235,7 @@ public class WorkUnitTransportPacket implements Serializable {
         String payloadString;
         String isARetryString;
         if(hasPayload()){
-            payloadString = "(payload:" + this.payload + ")";
+            payloadString = "(payload:" + this.task + ")";
         } else {
             payloadString = "(payload:null)";
         }
@@ -285,12 +284,12 @@ public class WorkUnitTransportPacket implements Serializable {
                 Objects.equals(getSenderSendDate(), that.getSenderSendDate()) &&
                 Objects.equals(getCurrentJobCard(), that.getCurrentJobCard()) &&
                 Objects.equals(getCurrentParcelStatus(), that.getCurrentParcelStatus()) &&
-                Objects.equals(getPayload(), that.getPayload());
+                Objects.equals(getTask(), that.getTask());
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(getPacketID(), getSenderSendDate(), isARetry, getCurrentJobCard(), getCurrentParcelStatus(), getPayload());
+        return Objects.hash(getPacketID(), getSenderSendDate(), isARetry, getCurrentJobCard(), getCurrentParcelStatus(), getTask());
     }
 
     public WorkUnitTransportPacket deepClone(){
@@ -301,7 +300,7 @@ public class WorkUnitTransportPacket implements Serializable {
 
     private WorkUnitTransportPacket(){
         this.senderSendDate = null;
-        this.payload = null;
+        this.task = null;
         this.packetID = null;
         this.isARetry = false;
         this.currentJobCard = null;

@@ -29,9 +29,9 @@ import net.fhirfactory.pegacorn.petasos.model.pathway.ActivityID;
 import net.fhirfactory.pegacorn.petasos.model.resilience.episode.PetasosEpisodeIdentifier;
 import net.fhirfactory.pegacorn.petasos.model.resilience.parcel.ResilienceParcel;
 import net.fhirfactory.pegacorn.petasos.model.resilience.parcel.ResilienceParcelFinalisationStatusEnum;
-import net.fhirfactory.pegacorn.petasos.model.resilience.parcel.ResilienceParcelIdentifier;
+import net.fhirfactory.pegacorn.petasos.core.resources.task.datatypes.PetasosTaskToken;
 import net.fhirfactory.pegacorn.petasos.model.resilience.parcel.ResilienceParcelProcessingStatusEnum;
-import net.fhirfactory.pegacorn.petasos.model.uow.UoW;
+import net.fhirfactory.pegacorn.petasos.core.payloads.uow.UoW;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -62,13 +62,13 @@ public class STAResilienceParcelServicesIM {
             throw (new IllegalArgumentException("unitOfWork, wupTypeID or wupInstanceID are null in method invocation"));
         }
         if(LOG.isDebugEnabled()) {
-    		LOG.debug(".registerSOAParcel(): activityID (ActivityID).previousParcelIdentifier -->{}", activityID.getPreviousParcelIdentifier());
-    		LOG.debug(".registerSOAParcel(): activityID (ActivityID).previousEpisodeIdentifier --> {}", activityID.getPreviousEpisodeIdentifier());
-    		LOG.debug(".registerSOAParcel(): activityID (ActivityID).previousWUPFunctionTokan --> {}", activityID.getPreviousWUPFunctionToken());
+    		LOG.debug(".registerSOAParcel(): activityID (ActivityID).previousParcelIdentifier -->{}", activityID.getUpstreamTaskID());
+    		LOG.debug(".registerSOAParcel(): activityID (ActivityID).previousEpisodeIdentifier --> {}", activityID.getUpstreamEpisodeID());
+    		LOG.debug(".registerSOAParcel(): activityID (ActivityID).previousWUPFunctionTokan --> {}", activityID.getUpstreamDeliveredCapability());
     		LOG.debug(".registerSOAParcel(): activityID (ActivityID).previousWUPIdentifier --> {}", activityID.getPreviousWUPIdentifier());
-    		LOG.debug(".registerSOAParcel(): activityID (ActivityID).presentParcelIdentifier -->{}", activityID.getPresentParcelIdentifier());
-    		LOG.debug(".registerSOAParcel(): activityID (ActivityID).presentEpisodeIdentifier --> {}", activityID.getPresentEpisodeIdentifier());
-    		LOG.debug(".registerSOAParcel(): activityID (ActivityID).presentWUPFunctionTokan --> {}", activityID.getPresentWUPFunctionToken());
+    		LOG.debug(".registerSOAParcel(): activityID (ActivityID).presentParcelIdentifier -->{}", activityID.getCurrentTaskID());
+    		LOG.debug(".registerSOAParcel(): activityID (ActivityID).presentEpisodeIdentifier --> {}", activityID.getCurrentEpisodeID());
+    		LOG.debug(".registerSOAParcel(): activityID (ActivityID).presentWUPFunctionTokan --> {}", activityID.getCurrentDeliveredCapability());
     		LOG.debug(".registerSOAParcel(): activityID (ActivityID).presentWUPIdentifier --> {}", activityID.getPresentWUPIdentifier());
     		LOG.debug(".registerSOAParcel(): activityID (ContunuityID).createDate --> {}", activityID.getCreationDate());
     		LOG.debug(".registerSOAParcel(): unitOfWork (UoW).instanceID --> {}", unitOfWork.getInstanceID());
@@ -82,11 +82,11 @@ public class STAResilienceParcelServicesIM {
         LOG.trace(".registerParcel(): Checking and/or Creating a SOAWUAEpisde ID");
 
         if(!activityID.hasPresentEpisodeIdentifier()) {
-        	FDN newWUAFDN = new FDN(activityID.getPresentWUPFunctionToken().toVersionBasedFDNToken());
+        	FDN newWUAFDN = new FDN(activityID.getCurrentDeliveredCapability().toVersionBasedFDNToken());
         	FDN uowTypeFDN = new FDN(unitOfWork.getTypeID());
         	newWUAFDN.appendFDN(uowTypeFDN);
         	PetasosEpisodeIdentifier wuaEpisodeToken = new PetasosEpisodeIdentifier(newWUAFDN.getToken());
-        	activityID.setPresentEpisodeIdentifier(wuaEpisodeToken);
+        	activityID.setCurrentEpisodeID(wuaEpisodeToken);
         }
         // 1st, lets register the parcel
         LOG.trace(".registerSOAParcel(): check for existing ResilienceParcel instance for this WUP/UoW combination");
@@ -96,9 +96,9 @@ public class STAResilienceParcelServicesIM {
         } else {
             LOG.trace(".registerSOAParcel(): Attempted to retrieve existing ResilienceParcel, and there wasn't one, so let's create it!");
             parcelInstance = new ResilienceParcel(activityID, unitOfWork);
-            parcelCacheDM.addParcel(parcelInstance);
+            parcelCacheDM.addTask(parcelInstance);
             LOG.trace(".registerSOAParcel(): Set the PresentParcelInstanceID in the ActivityID (ActivityID), ParcelInstanceID --> {}", parcelInstance.getIdentifier());
-            activityID.setPresentParcelIdentifier(parcelInstance.getIdentifier());
+            activityID.setCurrentTaskID(parcelInstance.getIdentifier());
             Date registrationDate = Date.from(Instant.now());
             LOG.trace(".registerSOAParcel(): Set the Registration Date --> {}", registrationDate);
             parcelInstance.setRegistrationDate(registrationDate);
@@ -135,13 +135,13 @@ public class STAResilienceParcelServicesIM {
     }
 
     @Transactional
-    public ResilienceParcel notifySOAParcelProcessingStart(ResilienceParcelIdentifier parcelID) {
+    public ResilienceParcel notifySOAParcelProcessingStart(PetasosTaskToken parcelID) {
         LOG.debug(".notifyParcelProcessingStart(): Entry, parcelID --> {}", parcelID);
         if (parcelID == null) {
             throw (new IllegalArgumentException("parcelID is null in method invocation"));
         }
         LOG.trace(".notifyParcelProcessingStart(): retrieve existing Parcel");
-        ResilienceParcel currentParcel = parcelCacheDM.getParcelInstance(parcelID);
+        ResilienceParcel currentParcel = parcelCacheDM.getTask(parcelID);
         Date startDate = Date.from(Instant.now());
         LOG.trace(".notifyParcelProcessingStart(): Set the Start Date --> {}", startDate);
         currentParcel.setStartDate(startDate);
@@ -166,7 +166,7 @@ public class STAResilienceParcelServicesIM {
      * @return A ResilienceParcel with ALL the attributes updated accordingly.
      */
     @Transactional
-    public ResilienceParcel notifySOAParcelProcessingFinish(ResilienceParcelIdentifier parcelID, UoW unitOfWork) {
+    public ResilienceParcel notifySOAParcelProcessingFinish(PetasosTaskToken parcelID, UoW unitOfWork) {
         if(LOG.isDebugEnabled()) {
         	LOG.debug(".notifyParcelProcessingFinish(): Entry");
     		LOG.debug(".notifyParcelProcessingFinish(): parcelID (FDNToken) --> {}", parcelID);
@@ -182,7 +182,7 @@ public class STAResilienceParcelServicesIM {
             throw (new IllegalArgumentException("unitOfWork or parcelID are null in method invocation"));
         }
         LOG.trace(".notifyParcelProcessingFinish(): retrieve existing Parcel");
-        ResilienceParcel currentParcel = parcelCacheDM.getParcelInstance(parcelID);
+        ResilienceParcel currentParcel = parcelCacheDM.getTask(parcelID);
         if(LOG.isTraceEnabled()){
             LOG.debug(".notifyParcelProcessingFinish(): Parcel Retrieved, contents:");
             LOG.debug(".notifyParcelProcessingFinish(): parcelInstance (ResilienceParcel).episodeIdentifier --> {}", currentParcel.getEpisodeIdentifier());
@@ -249,13 +249,13 @@ public class STAResilienceParcelServicesIM {
     }
 
     @Transactional
-    public ResilienceParcel notifySOAParcelProcessingFailure(ResilienceParcelIdentifier parcelID, UoW unitOfWork) {
+    public ResilienceParcel notifySOAParcelProcessingFailure(PetasosTaskToken parcelID, UoW unitOfWork) {
         LOG.debug(".notifyParcelProcessingFailure(): Entry, parcelID --> {}, unitOfWork --> {}", parcelID, unitOfWork);
         if ((unitOfWork == null) || (parcelID == null)) {
             throw (new IllegalArgumentException(".notifyParcelProcessingFailure(): unitOfWork or parcelID are null in method invocation"));
         }
         LOG.trace(".notifyParcelProcessingFailure(): retrieve existing Parcel");
-        ResilienceParcel currentParcel = parcelCacheDM.getParcelInstance(parcelID);
+        ResilienceParcel currentParcel = parcelCacheDM.getTask(parcelID);
         LOG.trace(".notifyParcelProcessingFailure(): update the UoW (Egress Content)");
         currentParcel.getActualUoW().setEgressContent(unitOfWork.getEgressContent());
         LOG.trace(".notifyParcelProcessingFailure(): update the UoW Processing Outcome --> {}", unitOfWork.getProcessingOutcome());
@@ -303,13 +303,13 @@ public class STAResilienceParcelServicesIM {
     */
 
     @Transactional
-    public ResilienceParcel notifySOAParcelProcessingCancellation(ResilienceParcelIdentifier parcelID) {
+    public ResilienceParcel notifySOAParcelProcessingCancellation(PetasosTaskToken parcelID) {
         LOG.debug(".notifyParcelProcessingCancellation(): Entry, parcelID --> {}", parcelID);
         if (parcelID == null) {
             throw (new IllegalArgumentException(".notifyParcelProcessingFinalisation(): parcelID is null in method invocation"));
         }
         LOG.trace(".notifyParcelProcessingCancellation(): retrieve existing Parcel");
-        ResilienceParcel currentParcel = parcelCacheDM.getParcelInstance(parcelID);
+        ResilienceParcel currentParcel = parcelCacheDM.getTask(parcelID);
         LOG.trace(".notifyParcelProcessingCancellation(): checking to see if finish date has been set and, if not, setting it");
         if(!currentParcel.hasFinishedDate()) {
             Date finishDate = Date.from(Instant.now());
@@ -330,7 +330,7 @@ public class STAResilienceParcelServicesIM {
     }
 
     @Transactional
-    public void notifySOAParcelProcessingPurge(ResilienceParcelIdentifier parcelID) {
+    public void notifySOAParcelProcessingPurge(PetasosTaskToken parcelID) {
         LOG.debug(".notifyParcelProcessingPurge(): Entry, parcelID --> {}, unitOfWork --> {}", parcelID);
         if (parcelID == null) {
             throw (new IllegalArgumentException(".notifyParcelProcessingPurge(): parcelID is null in method invocation"));

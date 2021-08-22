@@ -22,12 +22,12 @@
 
 package net.fhirfactory.pegacorn.petasos.core.sta.resilience.processingplant.manager.tasks;
 
-import net.fhirfactory.pegacorn.common.model.componentid.TopologyNodeFDN;
+import net.fhirfactory.pegacorn.petasos.core.resources.node.datatypes.PetasosNodeFDN;
 import net.fhirfactory.pegacorn.deployment.topology.manager.TopologyIM;
 import net.fhirfactory.pegacorn.deployment.topology.model.nodes.WorkUnitProcessorTopologyNode;
 import net.fhirfactory.pegacorn.petasos.core.sta.resilience.processingplant.cache.STAServiceModuleActivityMatrixDM;
 import net.fhirfactory.pegacorn.petasos.model.pathway.ActivityID;
-import net.fhirfactory.pegacorn.petasos.model.resilience.activitymatrix.moa.ParcelStatusElement;
+import net.fhirfactory.pegacorn.petasos.model.resilience.activitymatrix.moa.PetasosTaskStatusElement;
 import net.fhirfactory.pegacorn.petasos.model.resilience.parcel.ResilienceParcelProcessingStatusEnum;
 import net.fhirfactory.pegacorn.petasos.model.wup.WUPJobCard;
 import org.slf4j.Logger;
@@ -46,15 +46,15 @@ public class RegisterNewSOAWorkUnitActivityTask {
 	@Inject
 	TopologyIM topologyIM;
 
-	public ParcelStatusElement registerNewWUA(WUPJobCard submittedJobCard) {
+	public PetasosTaskStatusElement registerNewWUA(WUPJobCard submittedJobCard) {
 		LOG.debug(".registerNewWUA(): Now register the parcel with the ActivityMatrix, submittedJobCard -- {}",
 				submittedJobCard);
 		if (submittedJobCard == null) {
 			throw (new IllegalArgumentException(".doTask(): submittedJobCard is null"));
 		}
 		ActivityID activityID = submittedJobCard.getActivityID();
-		ParcelStatusElement newStatusElement;
-		TopologyNodeFDN nodeFDN = new TopologyNodeFDN(activityID.getPresentWUPIdentifier());
+		PetasosTaskStatusElement newStatusElement;
+		PetasosNodeFDN nodeFDN = new PetasosNodeFDN(activityID.getPresentWUPIdentifier());
 		WorkUnitProcessorTopologyNode wup = (WorkUnitProcessorTopologyNode)topologyIM.getNode(nodeFDN);
 		switch (wup.getResilienceMode()) {
 			case RESILIENCE_MODE_MULTISITE: {
