@@ -24,17 +24,15 @@ package net.fhirfactory.pegacorn.petasos.core.payloads.uow;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import net.fhirfactory.pegacorn.common.model.generalid.FDN;
-import net.fhirfactory.pegacorn.common.model.generalid.FDNToken;
-import net.fhirfactory.pegacorn.common.model.generalid.RDN;
 import net.fhirfactory.pegacorn.petasos.core.payloads.manifest.DataParcelManifest;
+import net.fhirfactory.pegacorn.petasos.core.resources.task.datatypes.PetasosTaskCode;
 import org.apache.commons.lang3.SerializationUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.Serializable;
-import java.time.Instant;
 import java.util.Objects;
+import java.util.UUID;
 
 /**
  * @author Mark A. Hunter
@@ -45,13 +43,13 @@ public class UoW implements Serializable {
 
     public static final String HASH_ATTRIBUTE = "InstanceQualifier";
     /**
-     * The FDN (fully distinguished name) of this UoW Type.
+     * The PetasosTaskCode
      */
-    private FDNToken typeID;
+    private PetasosTaskCode currentImplementingCapability;
     /**
      * The FDN (fully distinguished name) of this UoW instance.
      */
-    private UoWIdentifier instanceID;
+    private String instanceID;
     /**
      * The set of (JSON) objects that represent the ingress (or starting set) of
      * information of this UoW.
@@ -79,7 +77,7 @@ public class UoW implements Serializable {
         this.ingresContent = null;
         this.egressContent = new UoWPayloadSet();
         this.processingOutcome = null;
-        this.typeID = null;
+        this.currentImplementingCapability = null;
         this.failureDescription = null;
         this.instanceID = null;
     }
@@ -93,19 +91,19 @@ public class UoW implements Serializable {
         this.egressContent = new UoWPayloadSet();
         LOG.trace(".UoW(): egressContent created and assigned");
         this.processingOutcome = UoWProcessingOutcomeEnum.UOW_OUTCOME_NOTSTARTED;
-        LOG.trace(".UoW(): Creating the typeID, first extract inputPayload manifest");
-        FDN contentFDN = inputPayload.getPayloadManifest().getContentDescriptor().toFDN();
-        LOG.trace(".UoW(): Creating the typeID, now convert to an FDNToken");
-        FDNToken contentFDNToken = contentFDN.getToken();
-        LOG.trace(".UoW(): Creating the typeID, now clone it and assign it to the typeID of this UoW");
-        this.typeID = SerializationUtils.clone(contentFDNToken);
-        LOG.trace(".UoW(): typeID --> {}", this.typeID);
+//        LOG.trace(".UoW(): Creating the typeID, first extract inputPayload manifest");
+//        FDN contentFDN = inputPayload.getPayloadManifest().getContentDescriptor().toFDN();
+//        LOG.trace(".UoW(): Creating the typeID, now convert to an FDNToken");
+//        FDNToken contentFDNToken = contentFDN.getToken();
+//        LOG.trace(".UoW(): Creating the typeID, now clone it and assign it to the typeID of this UoW");
+//        this.typeID = SerializationUtils.clone(contentFDNToken);
+        LOG.trace(".UoW(): typeID --> {}", this.currentImplementingCapability);
         this.failureDescription = null;
         LOG.trace(".UoW(): Now generating instanceID");
         generateInstanceID();
         LOG.trace(".UoW(): instanceID generated");
         if (LOG.isTraceEnabled()) {
-            LOG.trace(".UoW(FDN, UoWPayloadSet): this.typeID --> {}, this.instanceID --> {}", this.typeID, this.instanceID);
+            LOG.trace(".UoW(FDN, UoWPayloadSet): this.typeID --> {}, this.instanceID --> {}", this.currentImplementingCapability, this.instanceID);
         }
     }
 
@@ -118,17 +116,12 @@ public class UoW implements Serializable {
             this.egressContent.getPayloadElements().add(SerializationUtils.clone(currentPayload));
         }
         this.processingOutcome = originalUoW.getProcessingOutcome();
-        this.typeID = SerializationUtils.clone(originalUoW.getTypeID());
+        this.currentImplementingCapability = SerializationUtils.clone(originalUoW.getCurrentImplementingCapability());
     }
 
     private void generateInstanceID() {
         LOG.debug(".generateInstanceID(): Entry");
-        LOG.trace(".generateInstanceID(): generating an instance id based on Timestamp");
-        String generatedInstanceValue = Long.toString(Instant.now().getNano());
-        FDN instanceFDN = new FDN(this.typeID);
-        RDN newRDN = new RDN(HASH_ATTRIBUTE, generatedInstanceValue);
-        instanceFDN.appendRDN(newRDN);
-        this.instanceID = new UoWIdentifier(instanceFDN.getToken());
+        this.setInstanceID(UUID.randomUUID().toString());
         LOG.debug(".generateInstanceID(): Exit");
     }
 
@@ -145,17 +138,17 @@ public class UoW implements Serializable {
      * @return FDN - the UoW Instance FDN (which will be unique for each UoW
      * within the system).
      */
-    public UoWIdentifier getInstanceID() {
+    public String getInstanceID() {
         return instanceID;
     }
     
-    public void setInstanceID(UoWIdentifier uowID) {
+    public void setInstanceID(String uowID) {
     	this.instanceID = uowID;
     }
 
     // typeID Helper/Bean methods
-    public boolean hasTypeID() {
-        if (this.typeID == null) {
+    public boolean hasUowTypeID() {
+        if (this.currentImplementingCapability == null) {
             return (false);
         } else {
             return (true);
@@ -166,12 +159,12 @@ public class UoW implements Serializable {
      * @return FDN - the UoW Type FDN (which describes the type or context of
      * UoW).
      */
-    public FDNToken getTypeID() {
-        return this.typeID;
+    public PetasosTaskCode getCurrentImplementingCapability() {
+        return this.currentImplementingCapability;
     }
 
-    public void setUoWTypeID(FDNToken uowTypeID) {
-        this.typeID = uowTypeID;
+    public void setUoWTypeID(PetasosTaskCode uowTypeID) {
+        this.currentImplementingCapability = uowTypeID;
         generateInstanceID();
     }
 
@@ -255,8 +248,8 @@ public class UoW implements Serializable {
         } else {
             uowToString = uowToString + "(instanceID:null),";
         }
-        if (hasTypeID()) {
-            uowToString = uowToString + "(typeID:" + typeID.toString() + "),";
+        if (hasUowTypeID()) {
+            uowToString = uowToString + "(typeID:" + currentImplementingCapability.toString() + "),";
         } else {
             uowToString = uowToString + "(typeID:null),";
         }
@@ -321,7 +314,7 @@ public class UoW implements Serializable {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         UoW uoW = (UoW) o;
-        return Objects.equals(getTypeID(), uoW.getTypeID()) &&
+        return Objects.equals(getCurrentImplementingCapability(), uoW.getCurrentImplementingCapability()) &&
                 Objects.equals(getInstanceID(), uoW.getInstanceID()) &&
                 Objects.equals(getIngresContent(), uoW.getIngresContent()) &&
                 Objects.equals(getEgressContent(), uoW.getEgressContent()) &&
@@ -331,7 +324,7 @@ public class UoW implements Serializable {
 
     @Override
     public int hashCode() {
-        return Objects.hash(getTypeID(), getInstanceID(), getIngresContent(), getEgressContent(), getFailureDescription(), getProcessingOutcome());
+        return Objects.hash(getCurrentImplementingCapability(), getInstanceID(), getIngresContent(), getEgressContent(), getFailureDescription(), getProcessingOutcome());
     }
 
     public boolean hasFailureDescription(){
@@ -350,7 +343,4 @@ public class UoW implements Serializable {
         this.failureDescription = failureDescription;
     }
 
-    public void setTypeID(FDNToken typeID) {
-        this.typeID = typeID;
-    }
 }

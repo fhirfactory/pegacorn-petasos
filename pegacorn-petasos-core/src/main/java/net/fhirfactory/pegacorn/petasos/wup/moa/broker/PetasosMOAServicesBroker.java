@@ -1,0 +1,272 @@
+/*
+ * Copyright (c) 2020 Mark A. Hunter (ACT Health)
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in all
+ * copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ */
+
+package net.fhirfactory.pegacorn.petasos.wup.moa.broker;
+
+import net.fhirfactory.pegacorn.common.model.generalid.FDN;
+import net.fhirfactory.pegacorn.common.model.generalid.FDNToken;
+import net.fhirfactory.pegacorn.common.model.generalid.RDN;
+import net.fhirfactory.pegacorn.deployment.topology.model.nodes.WorkUnitProcessorTopologyNode;
+import net.fhirfactory.pegacorn.petasos.audit.brokers.MOAServicesAuditBroker;
+import net.fhirfactory.pegacorn.petasos.cache.manager.DataParcelSubscriptionMapIM;
+import net.fhirfactory.pegacorn.petasos.control.episodes.coordinator.EpisodeActivityCoordinator;
+import net.fhirfactory.pegacorn.petasos.control.moa.pathway.interchange.manager.PathwayInterchangeManager;
+import net.fhirfactory.pegacorn.petasos.control.moa.pathway.wupcontainer.manager.WorkUnitProcessorFrameworkManager;
+import net.fhirfactory.pegacorn.petasos.control.tasks.accessors.TaskIM;
+import net.fhirfactory.pegacorn.petasos.core.payloads.uow.UoW;
+import net.fhirfactory.pegacorn.petasos.core.resources.task.PetasosTask;
+import net.fhirfactory.pegacorn.petasos.core.resources.task.datatypes.PetasosTaskToken;
+import net.fhirfactory.pegacorn.petasos.model.audit.PetasosParcelAuditTrailEntry;
+import net.fhirfactory.pegacorn.petasos.model.resilience.activitymatrix.moa.PetasosEpisode;
+import net.fhirfactory.pegacorn.petasos.model.resilience.episode.PetasosEpisodeStatusEnum;
+import net.fhirfactory.pegacorn.petasos.model.wup.WUPArchetypeEnum;
+import net.fhirfactory.pegacorn.petasos.model.wup.WUPFunctionToken;
+import net.fhirfactory.pegacorn.petasos.model.wup.WUPIdentifier;
+import net.fhirfactory.pegacorn.petasos.model.wup.WUPJobCard;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import javax.enterprise.context.ApplicationScoped;
+import javax.inject.Inject;
+import java.time.Instant;
+import java.util.Date;
+import java.util.List;
+
+@ApplicationScoped
+public class PetasosMOAServicesBroker {
+    private static final Logger LOG = LoggerFactory.getLogger(PetasosMOAServicesBroker.class);
+
+    @Inject
+    private TaskIM taskIM;
+
+    @Inject
+    private EpisodeActivityCoordinator episodeCoordinator;
+
+    @Inject
+    WorkUnitProcessorFrameworkManager wupFrameworkManager;
+
+    @Inject
+    PathwayInterchangeManager wupInterchangeManager;
+
+    @Inject
+    DataParcelSubscriptionMapIM topicManager;
+
+    @Inject
+    MOAServicesAuditBroker auditWriter;
+
+    /**
+     *
+     * @param jobCard
+     * @param task
+     * @return
+     */
+    public PetasosEpisode registerStandardWorkUnitActivity(WUPJobCard jobCard, PetasosTask task) {
+        if ((jobCard == null) || (task == null)) {
+            throw (new IllegalArgumentException(".registerWorkUnitActivity(): jobCard or initialUoW are null"));
+        }
+        PetasosTask newParcel = taskIM.registerTask(jobCard.getActivityID(), task, false);
+        jobCard.getActivityID().setCurrentTaskID(newParcel.getIdentifier());
+        PetasosEpisode statusElement = rasController.registerNewWorkUnitActivity(jobCard);
+        return (statusElement);
+    }
+
+    /**
+     *
+     * @param jobCard
+     * @param initialUoW
+     * @return
+     */
+    public PetasosEpisode registerSystemEdgeWorkUnitActivity(WUPJobCard jobCard, UoW initialUoW) {
+        if ((jobCard == null) || (initialUoW == null)) {
+            throw (new IllegalArgumentException(".registerWorkUnitActivity(): jobCard or initialUoW are null"));
+        }
+        ResilienceParcel newParcel = taskIM.registerTask(jobCard.getActivityID(), initialUoW, true);
+        jobCard.getActivityID().setCurrentTaskID(newParcel.getIdentifier());
+        PetasosEpisode statusElement = rasController.registerNewWorkUnitActivity(jobCard);
+        return (statusElement);
+    }
+
+    /**
+     *
+     * @param jobCard
+     */
+    public void notifyStartOfWorkUnitActivity(WUPJobCard jobCard) {
+        if ((jobCard == null)) {
+            throw (new IllegalArgumentException(".registerWorkUnitActivity(): jobCard or startedUoW are null"));
+        }
+        ResilienceParcel finishedParcel = taskIM.notifyParcelProcessingStart(jobCard.getActivityID().getCurrentTaskID());
+        rasController.synchroniseJobCard(jobCard);
+    }
+
+    /**
+     *
+     * @param jobCard
+     * @param finishedUoW
+     */
+    public void notifyFinishOfWorkUnitActivity(WUPJobCard jobCard, UoW finishedUoW) {
+        if ((jobCard == null) || (finishedUoW == null)) {
+            throw (new IllegalArgumentException(".registerWorkUnitActivity(): jobCard or finishedUoW are null"));
+        }
+        ResilienceParcel finishedParcel = taskIM
+                .notifyParcelProcessingFinish(jobCard.getActivityID().getCurrentTaskID(), finishedUoW);
+        rasController.synchroniseJobCard(jobCard);
+    }
+
+    /**
+     *
+     * @param jobCard
+     */
+    public void notifyFinalisationOfWorkUnitActivity(WUPJobCard jobCard) {
+        if ((jobCard == null)) {
+            throw (new IllegalArgumentException(".registerWorkUnitActivity(): jobCard is null"));
+        }
+        ResilienceParcel finishedParcel = taskIM
+                .notifyParcelProcessingFinalisation(jobCard.getActivityID().getCurrentTaskID());
+        rasController.synchroniseJobCard(jobCard);
+    }
+
+    /**
+     *
+     * @param jobCard
+     * @param failedUoW
+     */
+    public void notifyFailureOfWorkUnitActivity(WUPJobCard jobCard, UoW failedUoW) {
+        if ((jobCard == null) || (failedUoW == null)) {
+            throw (new IllegalArgumentException(".notifyFailureOfWorkUnitActivity(): jobCard or finishedUoW are null"));
+        }
+        ResilienceParcel failedParcel = taskIM
+                .notifyParcelProcessingFinish(jobCard.getActivityID().getCurrentTaskID(), failedUoW);
+        rasController.synchroniseJobCard(jobCard);
+    }
+
+    /**
+     *
+     * @param jobCard
+     */
+    public void notifyCancellationOfWorkUnitActivity(WUPJobCard jobCard) {
+        if (jobCard == null) {
+            throw (new IllegalArgumentException(
+                    ".notifyCancellationOfWorkUnitActivity(): jobCard or finishedUoW are null"));
+        }
+        ResilienceParcel failedParcel = taskIM
+                .notifyParcelProcessingCancellation(jobCard.getActivityID().getCurrentTaskID());
+    }
+
+    /**
+     *
+     * @param jobCard
+     */
+    public void notifyPurgeOfWorkUnitActivity(WUPJobCard jobCard) {
+        if ((jobCard == null)) {
+            throw (new IllegalArgumentException(".registerWorkUnitActivity(): jobCard is null"));
+        }
+        if (!jobCard.hasActivityID()) {
+            return;
+        }
+        if (!jobCard.getActivityID().hasCurrentTaskID()) {
+            return;
+        }
+        taskIM.notifyParcelProcessingPurge(jobCard.getActivityID().getCurrentTaskID());
+    }
+
+    /**
+     *
+     * @param existingJobCard
+     */
+    public void synchroniseJobCard(WUPJobCard existingJobCard) {
+        rasController.synchroniseJobCard(existingJobCard);
+    }
+
+    public PetasosEpisode getCurrentParcelStatusElement(PetasosTaskToken parcelInstanceID) {
+        PetasosEpisode statusElement = rasController.getStatusElement(parcelInstanceID);
+        return (statusElement);
+    }
+
+    public void registerDownstreamWUP(PetasosEpisodeIdentifier wuaEpisodeID, WUPFunctionToken interestedWUPFunctionID) {
+        rasController.registerWUAEpisodeDownstreamWUPInterest(wuaEpisodeID, interestedWUPFunctionID);
+    }
+
+    public ResilienceParcel getUnprocessedParcel(FDNToken wupTypeID) {
+        // TODO - this is the mechanism to re-start on failure, not currently
+        // implemented.
+        return (null);
+    }
+
+    public void registerWorkUnitProcessor(WorkUnitProcessorTopologyNode newElement, List<DataParcelManifest> payloadTopicSet,
+                                          WUPArchetypeEnum wupNature) {
+        LOG.debug(".registerWorkUnitProcessor(): Entry, newElement --> {}, payloadTopicSet --> {}", newElement,
+                payloadTopicSet);
+        switch (wupNature) {
+            case WUP_NATURE_LADON_TIMER_TRIGGERED_BEHAVIOUR:
+            case WUP_NATURE_LAODN_STIMULI_TRIGGERED_BEHAVIOUR:
+                // Do nothing, as the above WUPs are handled by their own specific frameworks.
+                break;
+            case WUP_NATURE_LADON_BEHAVIOUR_WRAPPER:
+                wupInterchangeManager.buildWUPInterchangeRoutes(newElement, wupNature);
+                break;
+            case WUP_NATURE_API_ANSWER:
+            case WUP_NATURE_API_CLIENT:
+            case WUP_NATURE_API_PUSH:
+            case WUP_NATURE_API_RECEIVE:
+            case WUP_NATURE_LADON_STANDARD_MOA:
+            case WUP_NATURE_MESSAGE_EXTERNAL_CONCURRENT_INGRES_POINT:
+            case WUP_NATURE_MESSAGE_EXTERNAL_EGRESS_POINT:
+            case WUP_NATURE_MESSAGE_EXTERNAL_INGRES_POINT:
+            case WUP_NATURE_MESSAGE_WORKER:
+            default:
+                wupFrameworkManager.buildWUPFramework(newElement, payloadTopicSet, wupNature);
+                wupInterchangeManager.buildWUPInterchangeRoutes(newElement, wupNature);
+        }
+    }
+
+    public PetasosParcelAuditTrailEntry transactionFailedPriorOnInitialValidation(WUPIdentifier wup, String action, UoW theUoW) {
+        if (LOG.isDebugEnabled()) {
+            LOG.debug(".transactionAuditEntry(): Entry, ");
+            LOG.debug(".transactionAuditEntry(): Entry, wup (WUPIdentifier) --> {}", wup);
+            LOG.debug(".transactionAuditEntry(): Entry, action (String) --> {}", action);
+            LOG.debug(".transactionAuditEntry(): Entry, theUoW (UoW) --> {}", theUoW);
+        }
+        if ((wup == null) || (action == null) || (theUoW == null)) {
+            throw (new IllegalArgumentException(".writeAuditEntry(): wup, action or theUoW are null"));
+        }
+        PetasosParcelAuditTrailEntry newAuditEntry = new PetasosParcelAuditTrailEntry();
+        newAuditEntry.setAuditTrailEntryDate(Date.from(Instant.now()));
+        newAuditEntry.setActualUoW(theUoW);
+        FDN auditEntryType = new FDN();
+        auditEntryType.appendFDN(new FDN(theUoW.getCurrentImplementingCapability()));
+        auditEntryType.appendRDN(new RDN("action", action));
+        newAuditEntry.setParcelTypeID(auditEntryType.getToken());
+        FDN auditEntryIdentifier = new FDN();
+        auditEntryIdentifier.appendFDN(new FDN(theUoW.getInstanceID()));
+        auditEntryIdentifier.appendRDN(new RDN("action", action));
+        PetasosTaskToken parcelId = new PetasosTaskToken(auditEntryIdentifier.getToken());
+        newAuditEntry.setIdentifier(parcelId);
+        newAuditEntry.setParcelFinalsationStatus(ResilienceParcelFinalisationStatusEnum.PARCEL_FINALISATION_STATUS_FINALISED);
+        newAuditEntry.setProcessingStatus(PetasosEpisodeStatusEnum.PARCEL_STATUS_FAILED);
+        newAuditEntry.setParcelFinalisedDate(Date.from(Instant.now()));
+        newAuditEntry.setParcelFinishedDate(Date.from(Instant.now()));
+        newAuditEntry.setPrimaryWUPIdentifier(wup);
+        auditWriter.logActivity(newAuditEntry, true);
+        return (newAuditEntry);
+    }
+
+}

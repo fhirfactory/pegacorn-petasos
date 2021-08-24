@@ -25,9 +25,9 @@ import net.fhirfactory.pegacorn.components.dataparcel.valuesets.DataParcelDirect
 import net.fhirfactory.pegacorn.components.interfaces.topology.ProcessingPlantInterface;
 import net.fhirfactory.pegacorn.deployment.topology.manager.TopologyIM;
 import net.fhirfactory.pegacorn.deployment.topology.model.nodes.WorkUnitProcessorTopologyNode;
-import net.fhirfactory.pegacorn.petasos.core.moa.pathway.naming.PetasosPathwayExchangePropertyNames;
+import net.fhirfactory.pegacorn.petasos.control.moa.pathway.naming.PetasosPathwayExchangePropertyNames;
 import net.fhirfactory.pegacorn.petasos.model.configuration.PetasosPropertyConstants;
-import net.fhirfactory.pegacorn.petasos.model.resilience.activitymatrix.moa.PetasosTaskStatusElement;
+import net.fhirfactory.pegacorn.petasos.model.resilience.activitymatrix.moa.PetasosEpisode;
 import net.fhirfactory.pegacorn.petasos.core.payloads.uow.UoW;
 import net.fhirfactory.pegacorn.petasos.model.wup.WUPJobCard;
 import net.fhirfactory.pegacorn.platform.edge.messaging.codecs.common.IPCPacketBeanCommon;
@@ -61,7 +61,7 @@ import java.time.Instant;
             LOG.trace(".constructInterProcessingPlantHandoverPacket(): Node Element retrieved --> {}", node);
             LOG.trace(".constructInterProcessingPlantHandoverPacket(): Extracting Job Card and Status Element from Exchange");
             WUPJobCard jobCard = camelExchange.getProperty(PetasosPropertyConstants.WUP_JOB_CARD_EXCHANGE_PROPERTY_NAME, WUPJobCard.class); // <-- Note the "WUPJobCard" property name, make sure this is aligned with the code in the WUPEgressConduit.java file
-            PetasosTaskStatusElement statusElement = camelExchange.getProperty(PetasosPropertyConstants.WUP_PETASOS_PARCEL_STATUS_EXCHANGE_PROPERTY_NAME, PetasosTaskStatusElement.class); // <-- Note the "ParcelStatusElement" property name, make sure this is aligned with the code in the WUPEgressConduit.java file
+            PetasosEpisode statusElement = camelExchange.getProperty(PetasosPropertyConstants.WUP_PETASOS_PARCEL_STATUS_EXCHANGE_PROPERTY_NAME, PetasosEpisode.class); // <-- Note the "ParcelStatusElement" property name, make sure this is aligned with the code in the WUPEgressConduit.java file
             LOG.trace(".constructInterProcessingPlantHandoverPacket(): Creating the Response message");
             InterProcessingPlantHandoverPacket forwardingPacket = new InterProcessingPlantHandoverPacket();
             forwardingPacket.setActivityID(jobCard.getActivityID());

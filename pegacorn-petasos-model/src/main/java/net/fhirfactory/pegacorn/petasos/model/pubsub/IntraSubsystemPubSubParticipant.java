@@ -21,7 +21,7 @@
  */
 package net.fhirfactory.pegacorn.petasos.model.pubsub;
 
-import net.fhirfactory.pegacorn.petasos.core.resources.node.datatypes.PetasosNodeToken;
+import net.fhirfactory.pegacorn.petasos.core.resources.component.datatypes.PetasosComponentIdentifierToken;
 
 import java.io.Serializable;
 import java.util.Objects;
@@ -40,7 +40,7 @@ public class IntraSubsystemPubSubParticipant implements Serializable {
         this.identifier = identifier;
     }
 
-    public IntraSubsystemPubSubParticipant(PetasosNodeToken wupToken){
+    public IntraSubsystemPubSubParticipant(PetasosComponentIdentifierToken wupToken){
         this.identifier = new IntraSubsystemPubSubParticipantIdentifier(wupToken);
     }
 

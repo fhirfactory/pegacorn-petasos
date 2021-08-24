@@ -42,14 +42,14 @@
  */
 package net.fhirfactory.pegacorn.platform.edge.messaging.codecs;
 
-import net.fhirfactory.pegacorn.petasos.core.resources.node.datatypes.PetasosNodeFunctionFDNToken;
+import net.fhirfactory.pegacorn.petasos.core.resources.component.datatypes.PetasosComponentTypeToken;
 import net.fhirfactory.pegacorn.deployment.topology.manager.TopologyIM;
 import net.fhirfactory.pegacorn.deployment.topology.model.nodes.WorkUnitProcessorTopologyNode;
-import net.fhirfactory.pegacorn.petasos.core.moa.brokers.PetasosMOAServicesBroker;
-import net.fhirfactory.pegacorn.petasos.core.moa.pathway.naming.PetasosPathwayExchangePropertyNames;
+import net.fhirfactory.pegacorn.petasos.wup.moa.broker.PetasosMOAServicesBroker;
+import net.fhirfactory.pegacorn.petasos.control.moa.pathway.naming.PetasosPathwayExchangePropertyNames;
 import net.fhirfactory.pegacorn.petasos.model.configuration.PetasosPropertyConstants;
 import net.fhirfactory.pegacorn.petasos.model.pathway.ActivityID;
-import net.fhirfactory.pegacorn.petasos.model.resilience.activitymatrix.moa.PetasosTaskStatusElement;
+import net.fhirfactory.pegacorn.petasos.model.resilience.activitymatrix.moa.PetasosEpisode;
 import net.fhirfactory.pegacorn.petasos.core.payloads.uow.UoW;
 import net.fhirfactory.pegacorn.petasos.model.wup.WUPActivityStatusEnum;
 import net.fhirfactory.pegacorn.petasos.model.wup.WUPIdentifier;
@@ -83,13 +83,13 @@ public class InterProcessingPlantHandoverRegistrationBean extends IPCPacketBeanC
         LOG.trace(".ipcReceiverActivityStart(): reconstituted token, now attempting to retrieve NodeElement");
         WorkUnitProcessorTopologyNode node = getWUPNodeFromExchange(camelExchange);
         LOG.trace(".ipcReceiverActivityStart(): Node Element retrieved --> {}", node);
-        PetasosNodeFunctionFDNToken wupFunctionToken = node.getNodeFunctionFDN().getFunctionToken();
+        PetasosComponentTypeToken wupFunctionToken = node.getNodeFunctionFDN().getFunctionToken();
         LOG.trace(".ipcReceiverActivityStart(): wupFunctionToken (NodeElementFunctionToken) for this activity --> {}", wupFunctionToken);
         LOG.trace(".ipcReceiverActivityStart(): Building the ActivityID for this activity");
         WUPIdentifier wupNodeID = new WUPIdentifier(node.getNodeFDN().getToken());
         ActivityID newActivityID = new ActivityID();
-        newActivityID.setCurrentDeliveredCapability(wupFunctionToken);
-        newActivityID.setPresentWUPIdentifier(wupNodeID);
+        newActivityID.setCurrentWUPType(wupFunctionToken);
+        newActivityID.setCurrentWUPIdentifier(wupNodeID);
         newActivityID.setUpstreamEpisodeID(thePacket.getActivityID().getCurrentEpisodeID());
         newActivityID.setUpstreamTaskID(thePacket.getActivityID().getCurrentTaskID());
         LOG.trace(".ipcReceiverActivityStart(): newActivityID (ActivityID) --> {}", newActivityID);
@@ -97,7 +97,7 @@ public class InterProcessingPlantHandoverRegistrationBean extends IPCPacketBeanC
         LOG.trace(".ipcReceiverActivityStart(): Creating new JobCard");
         WUPJobCard activityJobCard = new WUPJobCard(newActivityID, WUPActivityStatusEnum.WUP_ACTIVITY_STATUS_EXECUTING, WUPActivityStatusEnum.WUP_ACTIVITY_STATUS_EXECUTING, node.getConcurrencyMode(), node.getResilienceMode(), Date.from(Instant.now()));
         LOG.trace(".ipcReceiverActivityStart(): Registering the Work Unit Activity using the activityJobCard --> {} and UoW --> {}", activityJobCard, theUoW);
-        PetasosTaskStatusElement statusElement = this.servicesBroker.registerSystemEdgeWorkUnitActivity(activityJobCard, theUoW);
+        PetasosEpisode statusElement = this.servicesBroker.registerSystemEdgeWorkUnitActivity(activityJobCard, theUoW);
         LOG.trace(".ipcReceiverActivityStart(): Registration aftermath: statusElement --> {}", statusElement);
         LOG.trace(".ipcReceiverActivityStart(): Injecting Job Card and Status Element into Exchange for extraction by the WUP Egress Conduit");
         camelExchange.setProperty(PetasosPropertyConstants.WUP_JOB_CARD_EXCHANGE_PROPERTY_NAME, activityJobCard);

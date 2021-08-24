@@ -25,10 +25,9 @@ package net.fhirfactory.pegacorn.petasos.model.resilience.episode;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import net.fhirfactory.pegacorn.common.model.generalid.FDNToken;
+import net.fhirfactory.pegacorn.petasos.core.resources.task.valuesets.PetasosTaskFinalisationStatusEnum;
 import net.fhirfactory.pegacorn.petasos.model.audit.JsonDateSerializer;
 import net.fhirfactory.pegacorn.petasos.model.resilience.parcel.ResilienceParcel;
-import net.fhirfactory.pegacorn.petasos.model.resilience.parcel.ResilienceParcelFinalisationStatusEnum;
-import net.fhirfactory.pegacorn.petasos.model.resilience.parcel.ResilienceParcelProcessingStatusEnum;
 import net.fhirfactory.pegacorn.petasos.model.wup.WUPIdentifier;
 
 import java.time.Instant;
@@ -40,8 +39,8 @@ import java.util.concurrent.ConcurrentHashMap;
 public class PetasosEpisode {
     private ConcurrentHashMap<WUPIdentifier, ResilienceParcel> episodeParcelMap;
     private PetasosEpisodeIdentifier episodeIdentifier;
-    private ResilienceParcelFinalisationStatusEnum episodeFinalisationStatus;
-    private ResilienceParcelProcessingStatusEnum episodeProcessingStatus;
+    private PetasosTaskFinalisationStatusEnum episodeFinalisationStatus;
+    private PetasosEpisodeStatusEnum episodeProcessingStatus;
     private HashSet<PetasosEpisodeIdentifier> downstreamEpisodeIdentifierSet;
     private PetasosEpisodeIdentifier upstreamEpisodeIdentifier;
     private WUPIdentifier activeWUPIdentifier;
@@ -196,11 +195,11 @@ public class PetasosEpisode {
         }
     }
 
-    public ResilienceParcelFinalisationStatusEnum getEpisodeFinalisationStatus() {
+    public PetasosTaskFinalisationStatusEnum getEpisodeFinalisationStatus() {
         return episodeFinalisationStatus;
     }
 
-    public void setEpisodeFinalisationStatus(ResilienceParcelFinalisationStatusEnum episodeFinalisationStatus) {
+    public void setEpisodeFinalisationStatus(PetasosTaskFinalisationStatusEnum episodeFinalisationStatus) {
         synchronized(this.episodeLock) {
             this.episodeFinalisationStatus = episodeFinalisationStatus;
             updateEpisodeLastUpdateTime();
@@ -215,11 +214,11 @@ public class PetasosEpisode {
         }
         return(true);
     }
-    public ResilienceParcelProcessingStatusEnum getEpisodeProcessingStatus() {
+    public PetasosEpisodeStatusEnum getEpisodeProcessingStatus() {
         return(this.episodeProcessingStatus);
     }
 
-    public void setEpisodeProcessingStatus(ResilienceParcelProcessingStatusEnum newProcessingStatus) {
+    public void setEpisodeProcessingStatus(PetasosEpisodeStatusEnum newProcessingStatus) {
         synchronized(this.episodeLock) {
             this.episodeProcessingStatus = newProcessingStatus;
             updateEpisodeLastUpdateTime();

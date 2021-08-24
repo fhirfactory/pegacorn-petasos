@@ -22,19 +22,19 @@
 package net.fhirfactory.pegacorn.petasos.model.wup;
 
 
-import net.fhirfactory.pegacorn.petasos.core.resources.node.datatypes.PetasosNodeFunctionFDNToken;
+import net.fhirfactory.pegacorn.petasos.core.resources.component.datatypes.PetasosComponentTypeToken;
 
 /**
  *
  * @author Mark A. Hunter
  */
-public class WUPFunctionToken extends PetasosNodeFunctionFDNToken {
+public class WUPFunctionToken extends PetasosComponentTypeToken {
 
     public WUPFunctionToken(WUPFunctionToken originalToken){
         super(originalToken);
     }
 
-    public WUPFunctionToken(PetasosNodeFunctionFDNToken originalNodeToken){
+    public WUPFunctionToken(PetasosComponentTypeToken originalNodeToken){
         super(originalNodeToken);
     }
 

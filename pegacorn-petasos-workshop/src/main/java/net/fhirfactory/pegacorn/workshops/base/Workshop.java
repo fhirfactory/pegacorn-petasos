@@ -21,9 +21,9 @@
  */
 package net.fhirfactory.pegacorn.workshops.base;
 
-import net.fhirfactory.pegacorn.petasos.core.resources.node.datatypes.PetasosNodeFDN;
-import net.fhirfactory.pegacorn.petasos.core.resources.node.datatypes.PetasosNodeRDN;
-import net.fhirfactory.pegacorn.petasos.core.resources.node.valuesets.PetasosNodeTypeEnum;
+import net.fhirfactory.pegacorn.petasos.core.resources.component.datatypes.PetasosNodeFDN;
+import net.fhirfactory.pegacorn.petasos.core.resources.component.datatypes.PetasosNodeRDN;
+import net.fhirfactory.pegacorn.petasos.core.resources.component.valuesets.PetasosComponentTypeEnum;
 import net.fhirfactory.pegacorn.components.interfaces.topology.PegacornTopologyFactoryInterface;
 import net.fhirfactory.pegacorn.components.interfaces.topology.ProcessingPlantInterface;
 import net.fhirfactory.pegacorn.components.interfaces.topology.WorkshopInterface;
@@ -62,7 +62,7 @@ public abstract class Workshop extends RouteBuilder implements WorkshopInterface
 
     abstract protected String specifyWorkshopName();
     abstract protected String specifyWorkshopVersion();
-    abstract protected PetasosNodeTypeEnum specifyWorkshopType();
+    abstract protected PetasosComponentTypeEnum specifyWorkshopType();
     abstract protected void invokePostConstructInitialisation();
 
     protected PegacornTopologyFactoryInterface getTopologyFactory(){
@@ -127,7 +127,7 @@ public abstract class Workshop extends RouteBuilder implements WorkshopInterface
         WorkUnitProcessorTopologyNode foundWorkshop = null;
         for (PetasosNodeFDN containedWorkshopFDN : this.workshopNode.getWupSet()) {
             WorkUnitProcessorTopologyNode containedWorkshop = (WorkUnitProcessorTopologyNode)topologyIM.getNode(containedWorkshopFDN);
-            PetasosNodeRDN testRDN = new PetasosNodeRDN(PetasosNodeTypeEnum.WORKSHOP, wupName, wupVersion);
+            PetasosNodeRDN testRDN = new PetasosNodeRDN(PetasosComponentTypeEnum.WORKSHOP, wupName, wupVersion);
             if (testRDN.equals(containedWorkshop.getNodeRDN())) {
                 found = true;
                 foundWorkshop = containedWorkshop;

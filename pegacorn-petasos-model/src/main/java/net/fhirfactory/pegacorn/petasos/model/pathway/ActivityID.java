@@ -22,9 +22,11 @@
 package net.fhirfactory.pegacorn.petasos.model.pathway;
 
 import net.fhirfactory.pegacorn.internals.SerializableObject;
-import net.fhirfactory.pegacorn.petasos.core.resources.capability.PetasosCapability;
+import net.fhirfactory.pegacorn.petasos.core.resources.capability.datatypes.PetasosCapabilityID;
+import net.fhirfactory.pegacorn.petasos.core.resources.component.datatypes.PetasosComponentTypeToken;
 import net.fhirfactory.pegacorn.petasos.core.resources.task.datatypes.PetasosTaskToken;
-import net.fhirfactory.pegacorn.petasos.model.wup.WUPIdentifier;
+import org.apache.commons.lang3.SerializationUtils;
+import org.hl7.fhir.r4.model.Identifier;
 
 import java.io.Serializable;
 import java.time.Instant;
@@ -44,75 +46,82 @@ public class ActivityID implements Serializable {
     private SerializableObject presentParcelIdenifierLock;
     private PetasosTaskToken currentEpisodeID;
     private SerializableObject presentEpisodeIdentifierLock;
-    private WUPIdentifier previousWUPIdentifier;
-    private SerializableObject previousWUPIdentifierLock;
-    private PetasosCapability upstreamDeliveredCapability;
-    private SerializableObject previousWUPFunctionTokenLock;
-    private WUPIdentifier presentWUPIdentifier;
-    private SerializableObject presentWUPIdentifierLock;
-    private PetasosCapability currentDeliveredCapability;
-    private SerializableObject presentWUPFunctionTokenLock;
+    private Identifier upstreamWUPIdentifier;
+    private SerializableObject upstreamWUPIdentifierLock;
+    private PetasosComponentTypeToken upstreamWUPType;
+    private SerializableObject upstreamConsumedCapabilityLock;
+    private Identifier currentWUPIdentifier;
+    private SerializableObject currentWUPIdentifierLock;
+    private PetasosComponentTypeToken currentWUPType;
+    private SerializableObject currentConsumedCapabilityLock;
     private Date creationDate;
     private SerializableObject creationDateLock;
     private boolean resilientActivity;
     private SerializableObject resilientActivityLock;
 
-    public ActivityID(PetasosTaskToken previousParcelInstanceID, PetasosTaskToken presentParcelInstanceID, WUPIdentifier previousWUPInstanceID, WUPIdentifier presentWUPInstanceID, Date creationDate) {
+    public ActivityID( PetasosTaskToken upstreamTaskID,
+                       PetasosTaskToken currentTaskID,
+                       Identifier upstreamWUPIdentifier,
+                       Identifier currentWUPIdentifier,
+                       Date creationDate) {
         // Clear the deck
         this.upstreamTaskID = null;
         this.upstreamEpisodeID = null;
         this.currentTaskID = null;
         this.currentEpisodeID = null;
-        this.previousWUPIdentifier = null;
-        this.upstreamDeliveredCapability = null;
-        this.presentWUPIdentifier = null;
-        this.currentDeliveredCapability = null;
+        this.upstreamWUPIdentifier = null;
+        this.upstreamWUPType = null;
+        this.currentWUPIdentifier = null;
+        this.currentWUPType = null;
         this.creationDate = null;
 
         this.creationDateLock = new SerializableObject();
         this.presentParcelIdenifierLock = new SerializableObject();
         this.presentEpisodeIdentifierLock = new SerializableObject();
-        this.presentWUPFunctionTokenLock = new SerializableObject();
-        this.presentWUPIdentifierLock = new SerializableObject();
+        this.currentConsumedCapabilityLock = new SerializableObject();
+        this.currentWUPIdentifierLock = new SerializableObject();
         this.previousParcelIdentifierLock = new SerializableObject();
         this.previousEpisodeIdentifierLock = new SerializableObject();
-        this.previousWUPFunctionTokenLock = new SerializableObject();
-        this.previousWUPIdentifierLock = new SerializableObject();
+        this.upstreamConsumedCapabilityLock = new SerializableObject();
+        this.upstreamWUPIdentifierLock = new SerializableObject();
         this.resilientActivityLock = new SerializableObject();
         // Set Values
-        this.upstreamTaskID = previousParcelInstanceID;
-        this.currentTaskID = presentParcelInstanceID;
-        this.previousWUPIdentifier = previousWUPInstanceID;
-        this.presentWUPIdentifier = presentWUPInstanceID;
+        this.upstreamTaskID = upstreamTaskID;
+        this.currentTaskID = currentTaskID;
+        this.upstreamWUPIdentifier = upstreamWUPIdentifier;
+        this.currentWUPIdentifier = currentWUPIdentifier;
         this.creationDate = creationDate;
 
     }
 
-    public ActivityID(PetasosTaskToken previousParcelInstanceID, PetasosTaskToken presentParcelInstanceID, WUPIdentifier previousWUPInstanceID, WUPIdentifier presentWUPInstanceID) {
+    public ActivityID(PetasosTaskToken upstreamTaskID,
+                      PetasosTaskToken currentTaskID,
+                      Identifier upstreamWUPIdentifier,
+                      Identifier currentWUPIdentifier) {
         this.upstreamTaskID = null;
         this.upstreamEpisodeID = null;
         this.currentTaskID = null;
         this.currentEpisodeID = null;
-        this.previousWUPIdentifier = null;
-        this.upstreamDeliveredCapability = null;
-        this.presentWUPIdentifier = null;
-        this.currentDeliveredCapability = null;
+        this.upstreamWUPIdentifier = null;
+        this.upstreamWUPType = null;
+        this.currentWUPIdentifier = null;
+        this.currentWUPType = null;
         this.creationDate = null;
         this.creationDateLock = new SerializableObject();
         this.presentParcelIdenifierLock = new SerializableObject();
         this.presentEpisodeIdentifierLock = new SerializableObject();
-        this.presentWUPFunctionTokenLock = new SerializableObject();
-        this.presentWUPIdentifierLock = new SerializableObject();
+        this.currentConsumedCapabilityLock = new SerializableObject();
+        this.currentWUPIdentifierLock = new SerializableObject();
         this.previousParcelIdentifierLock = new SerializableObject();
         this.previousEpisodeIdentifierLock = new SerializableObject();
-        this.previousWUPFunctionTokenLock = new SerializableObject();
-        this.previousWUPIdentifierLock = new SerializableObject();
+        this.upstreamConsumedCapabilityLock = new SerializableObject();
+        this.upstreamWUPIdentifierLock = new SerializableObject();
         this.resilientActivityLock = new SerializableObject();
         // Set Values
-        this.upstreamTaskID = previousParcelInstanceID;
-        this.currentTaskID = presentParcelInstanceID;
-        this.previousWUPIdentifier = previousWUPInstanceID;
-        this.presentWUPIdentifier = presentWUPInstanceID;
+        this.upstreamTaskID = upstreamTaskID;
+        this.currentTaskID = currentTaskID;
+        this.upstreamWUPIdentifier = upstreamWUPIdentifier;
+        this.currentWUPIdentifier = currentWUPIdentifier;
         this.creationDate = Date.from(Instant.now());
         this.resilientActivity = false;
     }
@@ -122,21 +131,21 @@ public class ActivityID implements Serializable {
         this.upstreamEpisodeID = null;
         this.currentTaskID = null;
         this.currentEpisodeID = null;
-        this.previousWUPIdentifier = null;
-        this.upstreamDeliveredCapability = null;
-        this.presentWUPIdentifier = null;
-        this.currentDeliveredCapability = null;
+        this.upstreamWUPIdentifier = null;
+        this.upstreamWUPType = null;
+        this.currentWUPIdentifier = null;
+        this.currentWUPType = null;
         this.creationDate = Date.from(Instant.now());
         this.creationDateLock = new SerializableObject();
         this.resilientActivity = false;
         this.presentParcelIdenifierLock = new SerializableObject();
         this.presentEpisodeIdentifierLock = new SerializableObject();
-        this.presentWUPFunctionTokenLock = new SerializableObject();
-        this.presentWUPIdentifierLock = new SerializableObject();
+        this.currentConsumedCapabilityLock = new SerializableObject();
+        this.currentWUPIdentifierLock = new SerializableObject();
         this.previousParcelIdentifierLock = new SerializableObject();
         this.previousEpisodeIdentifierLock = new SerializableObject();
-        this.previousWUPFunctionTokenLock = new SerializableObject();
-        this.previousWUPIdentifierLock = new SerializableObject();
+        this.upstreamConsumedCapabilityLock = new SerializableObject();
+        this.upstreamWUPIdentifierLock = new SerializableObject();
         this.resilientActivityLock = new SerializableObject();
     }
 
@@ -145,53 +154,53 @@ public class ActivityID implements Serializable {
         this.upstreamEpisodeID = null;
         this.currentTaskID = null;
         this.currentEpisodeID = null;
-        this.previousWUPIdentifier = null;
-        this.upstreamDeliveredCapability = null;
-        this.presentWUPIdentifier = null;
-        this.currentDeliveredCapability = null;
+        this.upstreamWUPIdentifier = null;
+        this.upstreamWUPType = null;
+        this.currentWUPIdentifier = null;
+        this.currentWUPType = null;
         this.creationDate = null;
         this.creationDateLock = new SerializableObject();
         this.presentParcelIdenifierLock = new SerializableObject();
         this.presentEpisodeIdentifierLock = new SerializableObject();
-        this.presentWUPFunctionTokenLock = new SerializableObject();
-        this.presentWUPIdentifierLock = new SerializableObject();
+        this.currentConsumedCapabilityLock = new SerializableObject();
+        this.currentWUPIdentifierLock = new SerializableObject();
         this.previousParcelIdentifierLock = new SerializableObject();
         this.previousEpisodeIdentifierLock = new SerializableObject();
-        this.previousWUPFunctionTokenLock = new SerializableObject();
-        this.previousWUPIdentifierLock = new SerializableObject();
+        this.upstreamConsumedCapabilityLock = new SerializableObject();
+        this.upstreamWUPIdentifierLock = new SerializableObject();
         this.resilientActivityLock = new SerializableObject();
         // Set Values
         if (originalRecord.hasCreationDate()) {
-            this.creationDate = originalRecord.getCreationDate();
+            this.creationDate = SerializationUtils.clone(originalRecord.getCreationDate());
         }
-        if (originalRecord.hasPresentParcelIdentifier()) {
-            this.currentTaskID = new PetasosTaskToken(originalRecord.getCurrentTaskID());
+        if (originalRecord.hasCurrentTaskID()) {
+            this.currentTaskID = SerializationUtils.clone(originalRecord.getCurrentTaskID());
         }
         if (originalRecord.hasPresentEpisodeIdentifier()) {
-            this.currentEpisodeID = new PetasosTaskToken(originalRecord.getCurrentEpisodeID());
+            this.currentEpisodeID = SerializationUtils.clone(originalRecord.getCurrentEpisodeID());
         }
-        if (originalRecord.hasPresentWUPIdentifier()) {
-            this.presentWUPIdentifier = new WUPIdentifier(originalRecord.getPresentWUPIdentifier());
+        if (originalRecord.hasCurrentWUPIdentifier()) {
+            this.currentWUPIdentifier = SerializationUtils.clone(originalRecord.getCurrentWUPIdentifier());
         }
-        if (originalRecord.hasPresentWUPFunctionToken()) {
-            this.currentDeliveredCapability = new PetasosCapability(originalRecord.getCurrentDeliveredCapability());
+        if (originalRecord.hasCurrentWUPType()) {
+            this.currentWUPType = SerializationUtils.clone(originalRecord.getCurrentWUPType());
         }
-        if (originalRecord.hasPreviousParcelIdentifier()) {
-            this.upstreamTaskID = new PetasosTaskToken(originalRecord.getUpstreamTaskID());
+        if (originalRecord.hasUpstreamTaskID()) {
+            this.upstreamTaskID = SerializationUtils.clone(originalRecord.getUpstreamTaskID());
         }
         if (originalRecord.hasPreviousEpisodeIdentifier()) {
-            this.upstreamEpisodeID = new PetasosTaskToken(originalRecord.getUpstreamEpisodeID());
+            this.upstreamEpisodeID = SerializationUtils.clone(originalRecord.getUpstreamEpisodeID());
         }
-        if (originalRecord.hasPreviousWUPIdentifier()) {
-            this.previousWUPIdentifier = new WUPIdentifier(originalRecord.getPresentWUPIdentifier());
+        if (originalRecord.hasUpstreamWUPIdentifier()) {
+            this.upstreamWUPIdentifier = SerializationUtils.clone(originalRecord.getCurrentWUPIdentifier());
         }
-        if (originalRecord.hasPreviousWUPFunctionToken()) {
-            this.upstreamDeliveredCapability = new PetasosCapability(originalRecord.getCurrentDeliveredCapability());
+        if (originalRecord.hasUpstreamWUPType()) {
+            this.upstreamWUPType = SerializationUtils.clone(originalRecord.getCurrentWUPType());
         }
         this.resilientActivity = originalRecord.isResilientActivity();
     }
 
-    public boolean hasPreviousParcelIdentifier() {
+    public boolean hasUpstreamTaskID() {
         if (this.upstreamTaskID == null) {
             return (false);
         } else {
@@ -209,7 +218,7 @@ public class ActivityID implements Serializable {
         }
     }
 
-    public boolean hasPresentParcelIdentifier() {
+    public boolean hasCurrentTaskID() {
         if (this.currentTaskID == null) {
             return (false);
         } else {
@@ -227,39 +236,39 @@ public class ActivityID implements Serializable {
         }
     }
 
-    public boolean hasPreviousWUPIdentifier() {
-        if (this.previousWUPIdentifier == null) {
+    public boolean hasUpstreamWUPIdentifier() {
+        if (this.upstreamWUPIdentifier == null) {
             return (false);
         } else {
             return (true);
         }
     }
 
-    public WUPIdentifier getPreviousWUPIdentifier() {
-        return previousWUPIdentifier;
+    public Identifier getUpstreamWUPIdentifier() {
+        return upstreamWUPIdentifier;
     }
 
-    public void setPreviousWUPIdentifier(WUPIdentifier previousWUPID) {
-        synchronized (previousWUPIdentifierLock) {
-            this.previousWUPIdentifier = previousWUPID;
+    public void setUpstreamWUPIdentifier(Identifier previousWUPID) {
+        synchronized (upstreamWUPIdentifierLock) {
+            this.upstreamWUPIdentifier = previousWUPID;
         }
     }
 
-    public boolean hasPresentWUPIdentifier() {
-        if (this.presentWUPIdentifier == null) {
+    public boolean hasCurrentWUPIdentifier() {
+        if (this.currentWUPIdentifier == null) {
             return (false);
         } else {
             return (true);
         }
     }
 
-    public WUPIdentifier getPresentWUPIdentifier() {
-        return presentWUPIdentifier;
+    public Identifier getCurrentWUPIdentifier() {
+        return currentWUPIdentifier;
     }
 
-    public void setPresentWUPIdentifier(WUPIdentifier presentWUPID) {
-        synchronized (presentWUPIdentifierLock) {
-            this.presentWUPIdentifier = presentWUPID;
+    public void setCurrentWUPIdentifier(Identifier presentWUPID) {
+        synchronized (currentWUPIdentifierLock) {
+            this.currentWUPIdentifier = presentWUPID;
         }
     }
 
@@ -317,39 +326,39 @@ public class ActivityID implements Serializable {
         }
     }
 
-    public boolean hasPreviousWUPFunctionToken() {
-        if (this.upstreamDeliveredCapability == null) {
+    public boolean hasUpstreamWUPType() {
+        if (this.upstreamWUPType == null) {
             return (false);
         } else {
             return (true);
         }
     }
 
-    public PetasosCapability getUpstreamDeliveredCapability() {
-        return upstreamDeliveredCapability;
+    public PetasosComponentTypeToken getUpstreamWUPType() {
+        return upstreamWUPType;
     }
 
-    public void setUpstreamDeliveredCapability(PetasosCapability upstreamDeliveredCapability) {
-        synchronized (previousWUPFunctionTokenLock) {
-            this.upstreamDeliveredCapability = upstreamDeliveredCapability;
+    public void setUpstreamWUPType(PetasosComponentTypeToken upstreamWUPType) {
+        synchronized (upstreamConsumedCapabilityLock) {
+            this.upstreamWUPType = upstreamWUPType;
         }
     }
 
-    public boolean hasPresentWUPFunctionToken() {
-        if (this.currentDeliveredCapability == null) {
+    public boolean hasCurrentWUPType() {
+        if (this.currentWUPType == null) {
             return (false);
         } else {
             return (true);
         }
     }
 
-    public PetasosCapability getCurrentDeliveredCapability() {
-        return currentDeliveredCapability;
+    public PetasosComponentTypeToken getCurrentWUPType() {
+        return currentWUPType;
     }
 
-    public void setCurrentDeliveredCapability(PetasosCapability currentDeliveredCapability) {
-        synchronized (presentWUPFunctionTokenLock) {
-            this.currentDeliveredCapability = currentDeliveredCapability;
+    public void setCurrentWUPType(PetasosComponentTypeToken currentWUPType) {
+        synchronized (currentConsumedCapabilityLock) {
+            this.currentWUPType = currentWUPType;
         }
     }
 
@@ -363,71 +372,17 @@ public class ActivityID implements Serializable {
 
     @Override
     public String toString() {
-        String previousResilienceParcelInstanceIDString;
-        if (hasPreviousParcelIdentifier()) {
-            previousResilienceParcelInstanceIDString = "(previousParcelIdenifier:" + this.upstreamTaskID.toString() + ")";
-        } else {
-            previousResilienceParcelInstanceIDString = "(previousParcelIdenifier:null)";
-        }
-        String presentResilienceParcelInstanceIDString;
-        if (hasPresentParcelIdentifier()) {
-            presentResilienceParcelInstanceIDString = "(presentParcelIdentifier:" + this.currentTaskID.toString() + ")";
-        } else {
-            presentResilienceParcelInstanceIDString = "(presentParcelIdentifier:null)";
-        }
-        String presentWUAEpisodeString;
-        if (hasPresentEpisodeIdentifier()) {
-            presentWUAEpisodeString = "(presentEpisodeIdentifier:" + this.currentEpisodeID.toString() + ")";
-        } else {
-            presentWUAEpisodeString = "(presentEpisodeIdentifier:null)";
-        }
-        String previousWUAEpisodeString;
-        if (hasPreviousEpisodeIdentifier()) {
-            previousWUAEpisodeString = "(previousEpisodeIdentifier:" + this.upstreamEpisodeID.toString() + ")";
-        } else {
-            previousWUAEpisodeString = "(previousEpisodeIdentifier:null)";
-        }
-        String previousWUPFunctionTokenString;
-        if (hasPreviousWUPFunctionToken()) {
-            previousWUPFunctionTokenString = "(previousWUPFunctionToken:" + this.upstreamDeliveredCapability.toString() + ")";
-        } else {
-            previousWUPFunctionTokenString = "(previousWUPFunctionToken:null)";
-        }
-        String presentWUPFunctionTokenString;
-        if (hasPresentWUPFunctionToken()) {
-            presentWUPFunctionTokenString = "(presentWUPFunctionToken:" + this.currentDeliveredCapability.toString() + ")";
-        } else {
-            presentWUPFunctionTokenString = "(presentWUPFunctionToken:null)";
-        }
-        String previousWUPInstanceIDString;
-        if (hasPreviousWUPIdentifier()) {
-            previousWUPInstanceIDString = "(previousWUPIdentifier:" + this.previousWUPIdentifier.toString() + ")";
-        } else {
-            previousWUPInstanceIDString = "(previousWUPIdentifier:null)";
-        }
-        String presentWUPInstanceIDString;
-        if (hasPresentWUPIdentifier()) {
-            presentWUPInstanceIDString = "(presentWUPIdentifier:" + this.presentWUPIdentifier.toString() + ")";
-        } else {
-            presentWUPInstanceIDString = "(presentWUPIdentifier:null)";
-        }
-        String creationDateString;
-        if (hasCreationDate()) {
-            creationDateString = "(creationDate:" + this.creationDate.toString() + ")";
-        } else {
-            creationDateString = "(creationDate:null)";
-        }
-        String theString = "ActivityID{"
-                + previousResilienceParcelInstanceIDString + ","
-                + presentResilienceParcelInstanceIDString + ","
-                + previousWUAEpisodeString + ","
-                + presentWUAEpisodeString + ","
-                + previousWUPFunctionTokenString + ","
-                + presentWUPFunctionTokenString + ","
-                + previousWUPInstanceIDString + ","
-                + presentWUPInstanceIDString + ","
-                + creationDateString + "}";
-        return (theString);
+        return "ActivityID{" +
+                "upstreamTaskID=" + upstreamTaskID +
+                ", upstreamEpisodeID=" + upstreamEpisodeID +
+                ", currentTaskID=" + currentTaskID +
+                ", currentEpisodeID=" + currentEpisodeID +
+                ", upstreamWUPIdentifier=" + upstreamWUPIdentifier +
+                ", upstreamWUPType=" + upstreamWUPType +
+                ", currentWUPIdentifier=" + currentWUPIdentifier +
+                ", currentWUPType=" + currentWUPType +
+                ", creationDate=" + creationDate +
+                ", resilientActivity=" + resilientActivity +
+                '}';
     }
-    
 }

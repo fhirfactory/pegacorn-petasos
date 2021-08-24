@@ -22,9 +22,9 @@
 
 package net.fhirfactory.pegacorn.petasos.model.wup;
 
-import net.fhirfactory.pegacorn.petasos.core.resources.node.datatypes.PetasosNodeFDN;
-import net.fhirfactory.pegacorn.petasos.core.resources.node.datatypes.PetasosNodeToken;
-import net.fhirfactory.pegacorn.petasos.core.resources.node.datatypes.PetasosNodeRDN;
+import net.fhirfactory.pegacorn.petasos.core.resources.component.datatypes.PetasosNodeFDN;
+import net.fhirfactory.pegacorn.petasos.core.resources.component.datatypes.PetasosComponentIdentifierToken;
+import net.fhirfactory.pegacorn.petasos.core.resources.component.datatypes.PetasosNodeRDN;
 import org.apache.commons.lang3.SerializationUtils;
 
 import java.io.Serializable;
@@ -34,9 +34,9 @@ import java.util.ArrayList;
  * @author Mark A. Hunter
  * @since 2020-08-07
  */
-public class WUPIdentifier extends PetasosNodeToken implements Serializable {
+public class WUPIdentifier extends PetasosComponentIdentifierToken implements Serializable {
 	
-    public WUPIdentifier(PetasosNodeToken originalToken) {
+    public WUPIdentifier(PetasosComponentIdentifierToken originalToken) {
         this.setTokenValue(SerializationUtils.clone(originalToken.getTokenValue()));
     }
     public WUPIdentifier(){super();}

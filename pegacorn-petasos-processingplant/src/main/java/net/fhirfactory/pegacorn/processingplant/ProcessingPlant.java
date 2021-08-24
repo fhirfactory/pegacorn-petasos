@@ -21,10 +21,10 @@
  */
 package net.fhirfactory.pegacorn.processingplant;
 
-import net.fhirfactory.pegacorn.petasos.core.resources.node.datatypes.PetasosNodeFDN;
-import net.fhirfactory.pegacorn.petasos.core.resources.node.datatypes.PetasosNodeFunctionFDN;
-import net.fhirfactory.pegacorn.petasos.core.resources.node.datatypes.PetasosNodeRDN;
-import net.fhirfactory.pegacorn.petasos.core.resources.node.valuesets.PetasosNodeTypeEnum;
+import net.fhirfactory.pegacorn.petasos.core.resources.component.datatypes.PetasosNodeFDN;
+import net.fhirfactory.pegacorn.petasos.core.resources.component.datatypes.PetasosNodeFunctionFDN;
+import net.fhirfactory.pegacorn.petasos.core.resources.component.datatypes.PetasosNodeRDN;
+import net.fhirfactory.pegacorn.petasos.core.resources.component.valuesets.PetasosComponentTypeEnum;
 import net.fhirfactory.pegacorn.petasos.model.capabilities.CapabilityFulfillmentInterface;
 import net.fhirfactory.pegacorn.petasos.model.capabilities.base.CapabilityUtilisationRequest;
 import net.fhirfactory.pegacorn.petasos.model.capabilities.base.CapabilityUtilisationResponse;
@@ -121,7 +121,7 @@ public abstract class ProcessingPlant extends RouteBuilder implements Processing
         String processingPlantVersion = getPropertyFile().getSubsystemInstant().getProcessingPlantVersion();
         getLogger().debug(".resolveProcessingPlant(): Getting ProcessingPlant->{}, version->{}", processingPlantName, processingPlantVersion);
         getLogger().trace(".resolveProcessingPlant(): Resolving list of available ProcessingPlants");
-        List<TopologyNode> topologyNodes = topologyIM.nodeSearch(PetasosNodeTypeEnum.PROCESSING_PLANT, processingPlantName, processingPlantVersion);
+        List<TopologyNode> topologyNodes = topologyIM.nodeSearch(PetasosComponentTypeEnum.PROCESSING_PLANT, processingPlantName, processingPlantVersion);
         if(getLogger().isTraceEnabled()){
             if(topologyNodes == null){
                 getLogger().trace(".resolveProcessingPlant(): nodeSearch return a null list");
@@ -174,7 +174,7 @@ public abstract class ProcessingPlant extends RouteBuilder implements Processing
         WorkshopTopologyNode foundWorkshop = null;
         for (PetasosNodeFDN containedWorkshopFDN : this.processingPlantNode.getWorkshops()) {
             WorkshopTopologyNode containedWorkshop = (WorkshopTopologyNode)topologyIM.getNode(containedWorkshopFDN);
-            PetasosNodeRDN testRDN = new PetasosNodeRDN(PetasosNodeTypeEnum.WORKSHOP, workshopName, version);
+            PetasosNodeRDN testRDN = new PetasosNodeRDN(PetasosComponentTypeEnum.WORKSHOP, workshopName, version);
             if (testRDN.equals(containedWorkshop.getNodeRDN())) {
                 found = true;
                 foundWorkshop = containedWorkshop;
@@ -199,7 +199,7 @@ public abstract class ProcessingPlant extends RouteBuilder implements Processing
 
     @Override
     public String getSimpleFunctionName() {
-        PetasosNodeRDN functionRDN = getProcessingPlantNode().getNodeFunctionFDN().extractRDNForNodeType(PetasosNodeTypeEnum.PROCESSING_PLANT);
+        PetasosNodeRDN functionRDN = getProcessingPlantNode().getNodeFunctionFDN().extractRDNForNodeType(PetasosComponentTypeEnum.PROCESSING_PLANT);
         String functionName = functionRDN.getNodeName();
         return (functionName);
     }
@@ -223,7 +223,7 @@ public abstract class ProcessingPlant extends RouteBuilder implements Processing
 
     @Override
     public String getDeploymentSite() {
-        PetasosNodeRDN siteRDN = getProcessingPlantNode().getNodeFDN().extractRDNForNodeType(PetasosNodeTypeEnum.SITE);
+        PetasosNodeRDN siteRDN = getProcessingPlantNode().getNodeFDN().extractRDNForNodeType(PetasosComponentTypeEnum.SITE);
         String siteName = siteRDN.getNodeName();
         return (siteName);
     }

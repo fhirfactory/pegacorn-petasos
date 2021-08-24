@@ -35,7 +35,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 import net.fhirfactory.pegacorn.petasos.model.resilience.parcel.ResilienceParcelFinalisationStatusEnum;
-import net.fhirfactory.pegacorn.petasos.model.resilience.parcel.ResilienceParcelProcessingStatusEnum;
+import net.fhirfactory.pegacorn.petasos.model.resilience.episode.PetasosEpisodeStatusEnum;
 import net.fhirfactory.pegacorn.petasos.model.wup.WUPIdentifier;
 
 public class PetasosParcelAuditTrailEntry {
@@ -43,7 +43,7 @@ public class PetasosParcelAuditTrailEntry {
     private UoW actualUoW;
     private PetasosTaskToken identifier;
     private ResilienceParcelFinalisationStatusEnum parcelFinalsationStatus;
-    private ResilienceParcelProcessingStatusEnum processingStatus;
+    private PetasosEpisodeStatusEnum processingStatus;
     private HashSet<WUPIdentifier> alternativeWUPIdentifierSet;
     private HashSet<PetasosTaskToken> alternativeParcelIdentifiersSet;
     private HashSet<PetasosEpisodeIdentifier> downstreamEpisodeIdentifierSet;
@@ -239,15 +239,15 @@ public class PetasosParcelAuditTrailEntry {
         }
         return(true);
     }
-    public ResilienceParcelProcessingStatusEnum getProcessingStatus() {
+    public PetasosEpisodeStatusEnum getProcessingStatus() {
         return(this.processingStatus);
     }
     
-    public void setProcessingStatus(ResilienceParcelProcessingStatusEnum newProcessingStatus) {
+    public void setProcessingStatus(PetasosEpisodeStatusEnum newProcessingStatus) {
         this.processingStatus = newProcessingStatus;
     }    
 
-    public void setUowOutcome(ResilienceParcelProcessingStatusEnum newProcessingStatus) {
+    public void setUowOutcome(PetasosEpisodeStatusEnum newProcessingStatus) {
         this.processingStatus = newProcessingStatus;
     }
 

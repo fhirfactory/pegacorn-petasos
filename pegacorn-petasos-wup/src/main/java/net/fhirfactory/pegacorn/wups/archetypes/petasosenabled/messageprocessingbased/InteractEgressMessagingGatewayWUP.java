@@ -22,11 +22,9 @@
 
 package net.fhirfactory.pegacorn.wups.archetypes.petasosenabled.messageprocessingbased;
 
-import net.fhirfactory.pegacorn.petasos.core.moa.wup.GenericMessageBasedWUPTemplate;
-import net.fhirfactory.pegacorn.petasos.core.moa.wup.MessageBasedWUPEndpoint;
+import net.fhirfactory.pegacorn.petasos.wup.moa.GenericMessageBasedWUPTemplate;
+import net.fhirfactory.pegacorn.petasos.wup.moa.MessageBasedWUPEndpoint;
 import net.fhirfactory.pegacorn.petasos.model.wup.WUPArchetypeEnum;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 public abstract class InteractEgressMessagingGatewayWUP extends GenericMessageBasedWUPTemplate {
 

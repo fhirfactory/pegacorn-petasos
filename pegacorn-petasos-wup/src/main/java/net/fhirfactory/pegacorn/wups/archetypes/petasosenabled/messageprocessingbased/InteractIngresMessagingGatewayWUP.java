@@ -26,14 +26,14 @@ import java.util.ArrayList;
 import java.util.List;
 
 import net.fhirfactory.pegacorn.components.dataparcel.DataParcelManifest;
-import net.fhirfactory.pegacorn.petasos.core.moa.wup.MessageBasedWUPEndpoint;
+import net.fhirfactory.pegacorn.petasos.wup.moa.MessageBasedWUPEndpoint;
 import net.fhirfactory.pegacorn.petasos.model.configuration.PetasosPropertyConstants;
 import org.apache.camel.Exchange;
 import org.apache.camel.Processor;
 import org.apache.camel.model.RouteDefinition;
 
 import net.fhirfactory.pegacorn.petasos.model.wup.WUPArchetypeEnum;
-import net.fhirfactory.pegacorn.petasos.core.moa.wup.GenericMessageBasedWUPTemplate;
+import net.fhirfactory.pegacorn.petasos.wup.moa.GenericMessageBasedWUPTemplate;
 
 public abstract class InteractIngresMessagingGatewayWUP extends GenericMessageBasedWUPTemplate {
 

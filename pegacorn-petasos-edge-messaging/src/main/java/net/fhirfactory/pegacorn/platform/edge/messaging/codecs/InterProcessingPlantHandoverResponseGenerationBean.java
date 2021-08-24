@@ -23,9 +23,9 @@ package net.fhirfactory.pegacorn.platform.edge.messaging.codecs;
 
 import net.fhirfactory.pegacorn.deployment.topology.manager.TopologyIM;
 import net.fhirfactory.pegacorn.deployment.topology.model.nodes.WorkUnitProcessorTopologyNode;
-import net.fhirfactory.pegacorn.petasos.core.moa.pathway.naming.PetasosPathwayExchangePropertyNames;
+import net.fhirfactory.pegacorn.petasos.control.moa.pathway.naming.PetasosPathwayExchangePropertyNames;
 import net.fhirfactory.pegacorn.petasos.model.configuration.PetasosPropertyConstants;
-import net.fhirfactory.pegacorn.petasos.model.resilience.activitymatrix.moa.PetasosTaskStatusElement;
+import net.fhirfactory.pegacorn.petasos.model.resilience.activitymatrix.moa.PetasosEpisode;
 import net.fhirfactory.pegacorn.petasos.model.wup.WUPJobCard;
 import net.fhirfactory.pegacorn.platform.edge.messaging.codecs.common.IPCPacketBeanCommon;
 import net.fhirfactory.pegacorn.platform.edge.model.ipc.packets.InterProcessingPlantHandoverPacket;
@@ -58,7 +58,7 @@ public class InterProcessingPlantHandoverResponseGenerationBean  extends IPCPack
         LOG.trace(".generateInterProcessingPlantHandoverResponse(): Node Element retrieved --> {}", node);
         LOG.trace(".generateInterProcessingPlantHandoverResponse(): Extracting Job Card and Status Element from Exchange");
         WUPJobCard jobCard = (WUPJobCard)camelExchange.getProperty(PetasosPropertyConstants.WUP_JOB_CARD_EXCHANGE_PROPERTY_NAME, WUPJobCard.class);
-        PetasosTaskStatusElement statusElement = (PetasosTaskStatusElement)camelExchange.getProperty(PetasosPropertyConstants.WUP_PETASOS_PARCEL_STATUS_EXCHANGE_PROPERTY_NAME, PetasosTaskStatusElement.class);
+        PetasosEpisode statusElement = (PetasosEpisode)camelExchange.getProperty(PetasosPropertyConstants.WUP_PETASOS_PARCEL_STATUS_EXCHANGE_PROPERTY_NAME, PetasosEpisode.class);
         LOG.trace(".generateInterProcessingPlantHandoverResponse(): Creating the Response message");
         InterProcessingPlantHandoverResponsePacket response = new InterProcessingPlantHandoverResponsePacket();
         response.setActivityID(jobCard.getActivityID());

@@ -27,6 +27,7 @@ public enum PetasosIdentifierCodeTypeEnum {
     IDENTIFIER_CODE_PETASOS_TASK("idcode:petasos.task"),
     IDENTIFIER_CODE_PETASOS_TASK_TOKEN("idcode:petasos.task.token"),
     IDENTIFIER_CODE_PETASOS_TASK_EPISODE("idcode:petasos.task.episode"),
+    IDENTIFIER_CODE_PETASOS_CAPABILITY("idcode:petasos.capability"),
     IDENTIFIER_CODE_PETASOS_ENDPOINT("idcode:petasos.endpoint"),
     IDENTIFIER_CODE_PETASOS_AUDITEVENT("idcode:petasos.auditevent"),
     IDENTIFIER_CODE_PETASOS_NODE("idcode:petasos.node");

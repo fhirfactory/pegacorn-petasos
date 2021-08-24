@@ -26,7 +26,7 @@ import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import javax.enterprise.context.ApplicationScoped;
 
-import net.fhirfactory.pegacorn.petasos.core.resources.node.datatypes.PetasosNodeToken;
+import net.fhirfactory.pegacorn.petasos.core.resources.component.datatypes.PetasosComponentIdentifierToken;
 import net.fhirfactory.pegacorn.components.dataparcel.DataParcelManifest;
 import net.fhirfactory.pegacorn.components.dataparcel.DataParcelTypeDescriptor;
 import net.fhirfactory.pegacorn.components.dataparcel.valuesets.DataParcelNormalisationStatusEnum;
@@ -180,7 +180,7 @@ public class DataParcelSubscriptionMapDM {
 		}
 	}
 
-    public void addSubscriber(DataParcelTypeDescriptor contentDescriptor, PetasosNodeToken localSubscriberWUP){
+    public void addSubscriber(DataParcelTypeDescriptor contentDescriptor, PetasosComponentIdentifierToken localSubscriberWUP){
 		LOG.debug(".addSubscriber(): Entry, contentDescriptor->{}, localSubscriberWUP->{}", contentDescriptor, localSubscriberWUP);
 		if((contentDescriptor==null) || (localSubscriberWUP==null)) {
 			throw(new IllegalArgumentException(".addSubscriber(): payloadTopic or localSubscriberWUP is null"));

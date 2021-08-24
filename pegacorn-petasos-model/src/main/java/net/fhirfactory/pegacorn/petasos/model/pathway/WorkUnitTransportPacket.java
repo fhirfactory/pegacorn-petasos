@@ -24,7 +24,7 @@ package net.fhirfactory.pegacorn.petasos.model.pathway;
 
 import net.fhirfactory.pegacorn.internals.SerializableObject;
 import net.fhirfactory.pegacorn.petasos.core.resources.task.PetasosTask;
-import net.fhirfactory.pegacorn.petasos.model.resilience.activitymatrix.moa.PetasosTaskStatusElement;
+import net.fhirfactory.pegacorn.petasos.model.resilience.activitymatrix.moa.PetasosEpisode;
 
 import java.io.Serializable;
 import java.util.Date;
@@ -46,7 +46,7 @@ public class WorkUnitTransportPacket implements Serializable {
     private SerializableObject isARetryLock;
     private WUPJobCard currentJobCard;
     private SerializableObject currentJobCardLock;
-    private PetasosTaskStatusElement currentParcelStatus;
+    private PetasosEpisode currentParcelStatus;
     private SerializableObject currentParcelStatusLock;
     private PetasosTask task;
     private SerializableObject payloadLock;
@@ -152,11 +152,11 @@ public class WorkUnitTransportPacket implements Serializable {
         }
     }
 
-    public PetasosTaskStatusElement getCurrentParcelStatus() {
+    public PetasosEpisode getCurrentParcelStatus() {
         return currentParcelStatus;
     }
 
-    public void setCurrentParcelStatus(PetasosTaskStatusElement currentParcelStatus) {
+    public void setCurrentParcelStatus(PetasosEpisode currentParcelStatus) {
         synchronized (currentParcelStatusLock) {
             this.currentParcelStatus = currentParcelStatus;
             generateString();

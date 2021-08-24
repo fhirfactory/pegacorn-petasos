@@ -28,11 +28,11 @@ import ca.uhn.fhir.model.api.annotation.ResourceDef;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import net.fhirfactory.pegacorn.petasos.core.attributes.identifier.valuesets.PetasosIdentifierCodeTypeEnum;
 import net.fhirfactory.pegacorn.petasos.core.attributes.identifier.valuesets.PetasosIdentifierTypeFactory;
-import net.fhirfactory.pegacorn.petasos.core.payloads.manifest.DataParcelManifest;
 import net.fhirfactory.pegacorn.petasos.core.payloads.uow.UoW;
 import net.fhirfactory.pegacorn.petasos.core.payloads.uow.UoWIdentifier;
 import net.fhirfactory.pegacorn.petasos.core.payloads.uow.UoWPayload;
 import net.fhirfactory.pegacorn.petasos.core.payloads.uow.UoWProcessingOutcomeEnum;
+import net.fhirfactory.pegacorn.petasos.core.resources.task.datatypes.PetasosTaskCode;
 import net.fhirfactory.pegacorn.petasos.core.resources.task.datatypes.PetasosTaskReference;
 import net.fhirfactory.pegacorn.petasos.core.resources.task.datatypes.PetasosTaskToken;
 import net.fhirfactory.pegacorn.petasos.core.resources.task.valuesets.PetasosTaskExtensionMeanings;
@@ -367,14 +367,24 @@ public class PetasosTask extends Task {
         LOG.trace(".getUoW(): [Finish] Build the Egress Payload(s)");
         LOG.trace(".getUoW(): [Start] Assemble the Instance ID");
         UoWIdentifier uoWIdentifier = new UoWIdentifier(this.getIdentifierFirstRep());
-        uow.setInstanceID(uoWIdentifier);
+        uow.setInstanceID(uoWIdentifier.getValue());
         LOG.trace(".getUoW(): [Finish] Assemble the Instance ID");
         LOG.trace(".getUoW(): [Start] Assign the Processing Status");
         UoWProcessingOutcomeEnum outcomeEnum = UoWProcessingOutcomeEnum.fromFHIRTaskStatus(getStatus());
         uow.setProcessingOutcome(outcomeEnum);
         LOG.trace(".getUoW(): [Finish] Assign the Processing Status");
-        LOG.trace(".getUoW(): [Start] Build the Type ID");
-        uow.setTypeID();
+        LOG.trace(".getUoW(): [Start] Build the UoWTypeID");
+        PetasosTaskCode taskCode = new PetasosTaskCode(getCode());
+        uow.setUoWTypeID(taskCode);
+        LOG.trace(".getUoW(): [Finish] Build the UoWTypeID");
+        LOG.trace(".getUoW(): [Start] Populate the FailureDescription field");
+        if(hasStatusReason()) {
+            uow.setFailureDescription(getStatusReason().getText());
+        }
+        LOG.trace(".getUoW(): [Finish] Populate the FailureDescription field");
+
+        LOG.debug(".getUoW(): Exit, uow->{}", uow);
+        return(uow);
     }
 
     @JsonIgnore
